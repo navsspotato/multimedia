@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimedia Request System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f1f3d;
+  --navy-mid: #1a3260;
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
+  --accent: #f59e0b;
+  --green: #16a34a;
+  --red: #dc2626;
+  --border: #e2e8f0;
+  --text-muted: #64748b;
+  --bg: #f1f5f9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  font-size: 14px;
+  color: #1e293b;
+}
+
+h1,h2,h3,h4,h5,.font-display { font-family: 'Syne', sans-serif; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: 230px;
+  min-height: 100vh;
+  background: var(--navy);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 20px rgba(0,0,0,.15);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand-wrap {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.brand-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--blue), #60a5fa);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(37,99,235,.3);
+}
+.brand-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 800;
+  color: #fff; letter-spacing: .04em; line-height: 1.3;
+}
+.brand-sub {
+  font-size: 10px; color: rgba(255,255,255,.35);
+  font-weight: 300; text-transform: uppercase; letter-spacing: .08em;
+  margin-top: 2px;
+}
+
+.nav-section { padding: 8px 0; }
+.nav-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; color: rgba(255,255,255,.25);
+  text-transform: uppercase;
+  padding: 4px 18px 6px;
+}
+.sidebar-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px;
+  color: rgba(255,255,255,.5);
+  font-size: 13px; font-weight: 400;
+  border-left: 3px solid transparent;
+  cursor: pointer; text-decoration: none;
+  transition: all .18s;
+  position: relative;
+}
+.sidebar-link:hover {
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
+}
+.sidebar-link.active {
+  background: rgba(37,99,235,.18);
+  color: #fff;
+  border-left-color: var(--blue);
+  font-weight: 500;
+}
+.sidebar-link .bi { font-size: 15px; opacity: .8; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+  min-width: 20px; text-align: center;
+}
+
+/* Account section in sidebar */
+.sidebar-account {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 10px 0;
+}
+
+/* ── Header ── */
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px; font-weight: 700; color: var(--navy);
+}
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+/* Notification bell */
+.notif-btn {
+  position: relative;
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s;
+  color: var(--text-muted);
+}
+.notif-btn:hover { background: var(--bg); color: var(--navy); }
+.notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px;
+  background: var(--accent); border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+
+/* User button in topbar */
+.user-btn {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 5px 10px 5px 5px;
+  background: #fff; cursor: pointer; transition: all .15s;
+  position: relative;
+}
+.user-btn:hover { background: var(--bg); border-color: #cbd5e1; }
+.user-avatar {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-name { font-size: 12px; font-weight: 600; color: var(--navy); }
+.user-role { font-size: 10px; color: var(--text-muted); }
+.user-chevron { color: var(--text-muted); font-size: 12px; margin-left: 2px; transition: transform .2s; }
+.user-btn.open .user-chevron { transform: rotate(180deg); }
+
+/* Account Dropdown */
+.account-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+  z-index: 999;
+  overflow: hidden;
+  animation: dropIn .18s ease;
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.account-dropdown.show { display: block; }
+
+.acct-header {
+  padding: 16px;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  display: flex; align-items: center; gap: 12px;
+}
+.acct-avatar-lg {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--blue), #60a5fa);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+.acct-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.3; }
+.acct-role { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+.acct-info { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.acct-info-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0;
+  font-size: 12px; color: var(--text-muted);
+}
+.acct-info-row .bi { font-size: 13px; color: var(--blue); flex-shrink: 0; }
+
+.acct-menu { padding: 6px; }
+.acct-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13px; color: #1e293b;
+  cursor: pointer; transition: background .13s;
+  text-decoration: none;
+}
+.acct-menu-item:hover { background: var(--bg); }
+.acct-menu-item .bi { font-size: 14px; color: var(--text-muted); }
+.acct-menu-item.danger { color: #dc2626; }
+.acct-menu-item.danger .bi { color: #dc2626; }
+.acct-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* ── Stats ── */
+.stat-card {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  position: relative; overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.stat-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.07); transform: translateY(-1px); }
+.stat-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+}
+.stat-card.sc-blue::before  { background: var(--blue); }
+.stat-card.sc-amber::before { background: var(--accent); }
+.stat-card.sc-green::before { background: var(--green); }
+.stat-card.sc-red::before   { background: var(--red); }
+
+.stat-inner { padding: 18px 20px; }
+.stat-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 12px;
+}
+.sc-blue  .stat-icon { background: #dbeafe; color: var(--blue); }
+.sc-amber .stat-icon { background: #fef3c7; color: #d97706; }
+.sc-green .stat-icon { background: #dcfce7; color: var(--green); }
+.sc-red   .stat-icon { background: #fee2e2; color: var(--red); }
+.stat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 30px; font-weight: 800;
+  color: var(--navy); line-height: 1;
+}
+.stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+/* ── Table ── */
+.table > :not(caption) > * > * { padding: 12px 14px; vertical-align: middle; }
+.table thead th {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: .05em; border-bottom: 1px solid var(--border);
+  background: #f8fafc;
+}
+.table tbody tr:hover { background: #fafbff; }
+
+.badge-requested { background: #e0f2fe; color: #0369a1; }
+.badge-approved  { background: #dbeafe; color: #1d4ed8; }
+.badge-scheduled { background: #ede9fe; color: #6d28d9; }
+.badge-ongoing   { background: #ffedd5; color: #ea580c; }
+.badge-done      { background: #dcfce7; color: #16a34a; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.status-badge::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+}
+.cat-pill {
+  display: inline-block; padding: 3px 9px; border-radius: 5px;
+  font-size: 11px; background: var(--blue-light); color: var(--blue); font-weight: 500;
+}
+
+/* ── Category grid ── */
+.cat-option {
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; transition: all .15s;
+  background: #fff;
+}
+.cat-option:hover { border-color: var(--blue); background: #f0f5ff; }
+.cat-option.selected {
+  border-color: var(--blue); background: var(--blue-light);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+.cat-icon { font-size: 18px; margin-bottom: 6px; }
+.cat-name { font-size: 12px; font-weight: 600; color: var(--navy); }
+.cat-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Upload zone ── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 10px;
+  padding: 24px; text-align: center; cursor: pointer;
+  transition: all .15s; background: #fafafa;
+}
+.upload-zone:hover { border-color: var(--blue); background: #f0f5ff; }
+
+/* ── Progress track ── */
+.progress-track { display: flex; align-items: flex-start; }
+.prog-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.prog-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--border); background: #fff;
+  position: relative; z-index: 1;
+}
+.prog-dot.done  { background: var(--green); border-color: var(--green); }
+.prog-dot.active { background: var(--blue); border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.2); }
+.prog-line {
+  flex: 1; height: 2px; background: var(--border);
+  margin-top: -6px; width: 100%;
+}
+.prog-line.done { background: var(--green); }
+.prog-lbl { font-size: 9px; color: var(--text-muted); margin-top: 4px; text-align: center; }
+
+/* ── Chat FAB ── */
+.chatbox-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--blue), #3b82f6);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(37,99,235,.4);
+  z-index: 1050; transition: transform .15s, box-shadow .15s;
+}
+.chatbox-fab:hover { transform: scale(1.08); box-shadow: 0 8px 24px rgba(37,99,235,.5); }
+
+.chatbox {
+  display: none; position: fixed; bottom: 84px; right: 24px;
+  width: 300px; background: #fff;
+  border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.14);
+  z-index: 1050; overflow: hidden;
+  animation: dropIn .2s ease;
+}
+.chatbox.open { display: block; }
+.chat-header { background: var(--navy); padding: 14px 16px; }
+.chat-avatar {
+  width: 32px; height: 32px;
+  background: var(--blue); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+}
+.chat-body {
+  height: 180px; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.chat-msg { max-width: 85%; padding: 8px 11px; border-radius: 10px; font-size: 12px; line-height: 1.45; }
+.chat-msg.system { background: #f1f5f9; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 3px; }
+.chat-msg.user { background: var(--blue); color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+
+/* ── Toast ── */
+.success-toast {
+  display: none; position: fixed; top: 20px; right: 20px;
+  background: var(--green); color: #fff; padding: 13px 20px;
+  border-radius: 12px; font-size: 13px; font-weight: 500;
+  z-index: 1055; animation: slideIn .3s ease;
+  box-shadow: 0 4px 16px rgba(22,163,74,.35);
+  display: flex; align-items: center; gap: 8px;
+}
+.success-toast.hidden { display: none !important; }
+@keyframes slideIn {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ── Views ── */
+.view { display: none; padding: 24px; }
+.view.active { display: block; }
+
+/* ── Misc ── */
+.required { color: var(--red); }
+.filter-select {
+  padding: 6px 10px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 12px;
+  font-family: 'DM Sans', sans-serif; background: #fff;
+  color: #1e293b; outline: none;
+  transition: border-color .15s;
+}
+.filter-select:focus { border-color: var(--blue); }
+.action-btn {
+  padding: 5px 12px; border-radius: 7px;
+  font-size: 11px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: #fff; color: #1e293b;
+  font-family: 'DM Sans', sans-serif; transition: all .15s;
+}
+.action-btn:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+label.form-label {
+  font-size: 12px; font-weight: 600; color: var(--navy);
+  letter-spacing: .01em; margin-bottom: 5px;
+}
+.form-control, .form-select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; border-radius: 8px;
+  border-color: var(--border);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+.card { border-radius: 14px; }
+.card.border { border-color: var(--border) !important; }
+
+/* View card header */
+.view-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.view-header-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--navy);
+}
+
+/* Overlay for closing dropdowns */
+#overlay {
+  display: none; position: fixed; inset: 0; z-index: 900;
+}
+#overlay.show { display: block; }
+
+/* Profile modal */
+.modal-profile .modal-content {
+  border-radius: 16px; border: none;
+  box-shadow: 0 20px 60px rgba(0,0,0,.15);
+}
+.modal-profile .modal-header {
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  border-radius: 16px 16px 0 0; padding: 20px 24px;
+  border-bottom: none;
+}
+
+/* Section divider in form */
+.form-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--text-muted);
+  border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 14px; margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- Overlay (closes dropdowns) -->
+<div id="overlay" onclick="closeDropdowns()"></div>
+
+<div class="d-flex">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div id="sidebar">
+    <div class="brand-wrap">
+      <div class="brand-logo">🎨</div>
+      <div class="brand-name">Multimedia<br>Request</div>
+      <div class="brand-sub">CVMC Cagayan</div>
+    </div>
+
+    <div class="nav-section flex-grow-1">
+      <div class="nav-label mt-1 mb-1">Menu</div>
+      <a class="sidebar-link active" onclick="showView('dashboard',this)">
+        <i class="bi bi-grid-fill"></i>
+        Dashboard
+        <span class="nav-badge" id="total-badge">5</span>
+      </a>
+      <a class="sidebar-link" onclick="showView('request',this)">
+        <i class="bi bi-plus-circle-fill"></i>
+        New Request
+      </a>
+      <a class="sidebar-link" onclick="showView('my-requests',this)">
+        <i class="bi bi-clipboard2-check-fill"></i>
+        My Requests
+      </a>
+    </div>
+
+    <div class="sidebar-account">
+      <div class="nav-label mb-1">Account</div>
+      <a class="sidebar-link" onclick="openAccountModal()">
+        <i class="bi bi-person-circle"></i>
+        <div>
+          <div style="font-size:12px;line-height:1.2;">Secretary / Admin</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);line-height:1.2;">Joyce Ann La Madrid</div>
+        </div>
+        <i class="bi bi-chevron-right ms-auto" style="font-size:11px;opacity:.4;"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ MAIN ══ -->
+  <div class="flex-grow-1 d-flex flex-column" style="min-height:100vh;">
+
+    <!-- Header / Topbar -->
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="topbar-right">
+        <!-- Notification -->
+        <div class="notif-btn" title="Notifications">
+          <i class="bi bi-bell" style="font-size:15px;"></i>
+          <div class="notif-dot"></div>
+        </div>
+
+        <!-- User dropdown trigger -->
+        <div class="user-btn" id="user-btn" onclick="toggleAccountDropdown()">
+          <div class="user-avatar">JL</div>
+          <div>
+            <div class="user-name">Ma'am Joyce Ann</div>
+            <div class="user-role">Secretary / Admin</div>
+          </div>
+          <i class="bi bi-chevron-down user-chevron"></i>
+
+          <!-- Account Dropdown -->
+          <div class="account-dropdown" id="account-dropdown" onclick="event.stopPropagation()">
+            <div class="acct-header">
+              <div class="acct-avatar-lg">JL</div>
+              <div>
+                <div class="acct-name">Joyce Ann B. La Madrid</div>
+                <div class="acct-role">Secretary / Admin</div>
+              </div>
+            </div>
+
+            <div class="acct-info">
+              <div class="acct-info-row">
+                <i class="bi bi-building"></i>
+                <span>Hospital Operations</span>
+              </div>
+              <div class="acct-info-row">
+                <i class="bi bi-envelope"></i>
+                <span>j.lamadrid@cvmc.gov.ph</span>
+              </div>
+              <div class="acct-info-row">
+                <i class="bi bi-shield-check"></i>
+                <span>Requestor Access</span>
+              </div>
+            </div>
+
+            <div class="acct-menu">
+              <a class="acct-menu-item" onclick="openAccountModal(); closeDropdowns()">
+                <i class="bi bi-person"></i>
+                View Profile
+              </a>
+              <a class="acct-menu-item">
+                <i class="bi bi-bell"></i>
+                Notifications
+                <span class="nav-badge ms-auto" style="background:#e0f2fe;color:#0369a1;">3</span>
+              </a>
+              <a class="acct-menu-item">
+                <i class="bi bi-gear"></i>
+                Settings
+              </a>
+              <div class="acct-menu-divider"></div>
+              <a class="acct-menu-item danger">
+                <i class="bi bi-box-arrow-right"></i>
+                Sign Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD VIEW ── -->
+    <div class="view active" id="view-dashboard">
+
+      <!-- Stats row -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+          <div class="card stat-card sc-blue">
+            <div class="stat-inner">
+              <div class="stat-icon"><i class="bi bi-stack"></i></div>
+              <div class="stat-val" id="stat-total">5</div>
+              <div class="stat-lbl">Total Requests</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="card stat-card sc-amber">
+            <div class="stat-inner">
+              <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+              <div class="stat-val" id="stat-ongoing">-</div>
+              <div class="stat-lbl">Ongoing / Pending</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="card stat-card sc-green">
+            <div class="stat-inner">
+              <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
+              <div class="stat-val" id="stat-done">-</div>
+              <div class="stat-lbl">Completed</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-xl-3">
+          <div class="card stat-card sc-red">
+            <div class="stat-inner">
+              <div class="stat-icon"><i class="bi bi-exclamation-circle"></i></div>
+              <div class="stat-val" id="stat-followup">-</div>
+              <div class="stat-lbl">For Follow-up</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div class="card border overflow-hidden bg-white">
+        <div class="view-header">
+          <div class="view-header-title">All Requests</div>
+          <div class="d-flex gap-2">
+            <select class="filter-select" onchange="filterTable(this.value)">
+              <option value="">All Status</option>
+              <option>Requested</option><option>Approved</option>
+              <option>Scheduled</option><option>Ongoing</option><option>Done</option>
+            </select>
+            <select class="filter-select">
+              <option value="">All Divisions</option>
+              <option>Medical</option><option>Nursing Service</option>
+              <option>Allied Health</option><option>Finance</option>
+              <option>OMCC</option><option>Hospital Operations</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Division / Office</th>
+                <th>Project</th>
+                <th>Category</th>
+                <th>Target Date</th>
+                <th>Status</th>
+                <th>IT Staff</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /dashboard -->
+
+    <!-- ── NEW REQUEST VIEW ── -->
+    <div class="view" id="view-request">
+      <div class="card border bg-white p-4" style="max-width:680px;">
+        <h5 class="mb-1" style="color:var(--navy);">New Multimedia Request</h5>
+        <p class="text-muted mb-4" style="font-size:12px;">Fill in all required fields. Your request will be routed to the IT/Multimedia team for approval.</p>
+
+        <div class="form-section-label">Category</div>
+        <label class="form-label mb-2">Select Category <span class="required">*</span></label>
+        <div class="row g-2 mb-4" id="cat-grid">
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Graphic Design')">
+            <div class="cat-icon">🖼️</div>
+            <div class="cat-name">Graphic Design</div>
+            <div class="cat-desc">Tarps, congratulatory layouts</div>
+          </div></div>
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Web & Digital Design')">
+            <div class="cat-icon">💻</div>
+            <div class="cat-name">Web & Digital Design</div>
+            <div class="cat-desc">Website, digital materials</div>
+          </div></div>
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Audio Visual Presentation')">
+            <div class="cat-icon">📊</div>
+            <div class="cat-name">Audio Visual Presentation</div>
+            <div class="cat-desc">PPT, LED activities</div>
+          </div></div>
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Photography & Editing')">
+            <div class="cat-icon">📷</div>
+            <div class="cat-name">Photography & Editing</div>
+            <div class="cat-desc">Visitor photos, basic editing</div>
+          </div></div>
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Publication Design')">
+            <div class="cat-icon">📰</div>
+            <div class="cat-name">Publication Design</div>
+            <div class="cat-desc">Newsletter, publications</div>
+          </div></div>
+          <div class="col-6"><div class="cat-option" onclick="selectCat(this,'Branding & Identity')">
+            <div class="cat-icon">🏷️</div>
+            <div class="cat-name">Branding & Identity</div>
+            <div class="cat-desc">Logo, letterhead</div>
+          </div></div>
+        </div>
+
+        <div class="form-section-label">Request Details</div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label">Date of Request <span class="required">*</span></label>
+            <input type="date" class="form-control form-control-sm" id="req-date">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Target / Needed By <span class="required">*</span></label>
+            <input type="date" class="form-control form-control-sm" id="target-date">
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label">Division <span class="required">*</span></label>
+            <select class="form-select form-select-sm" id="division">
+              <option value="">— Select Division —</option>
+              <option>Medical</option>
+              <option>Nursing Service</option>
+              <option>Allied Health</option>
+              <option>Hospital Operations</option>
+              <option>OMCC</option>
+              <option>Finance</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Unit / Office / Department</label>
+            <input type="text" class="form-control form-control-sm" id="unit" placeholder="e.g. ICU, Records Section">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Project Title <span class="required">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="project-title" placeholder="Short name for this project">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Project Description <span class="required">*</span></label>
+          <textarea class="form-control form-control-sm" id="proj-desc" rows="4" placeholder="Describe what you need in detail — dimensions, content, references, etc."></textarea>
+        </div>
+
+        <div class="form-section-label">Delivery & Extras</div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label">Attachment / Delivery</label>
+            <select class="form-select form-select-sm">
+              <option>For Pick-up</option>
+              <option>Email Delivery</option>
+              <option>Shared Drive</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Remarks</label>
+            <input type="text" class="form-control form-control-sm" id="remarks" placeholder="Optional notes">
+          </div>
+        </div>
+
+        <div class="upload-zone mb-4" onclick="triggerUpload()">
+          <div style="font-size:28px;margin-bottom:8px;">📎</div>
+          <div style="font-size:13px;font-weight:500;color:#475569;">Click to attach files</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Reference images, content, etc. — PDF, DOCX, JPG, PNG (max 10 MB)</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary btn-sm px-4" onclick="showView('dashboard',null)">Cancel</button>
+          <button class="btn btn-primary btn-sm px-4" onclick="submitRequest()">Submit Request <i class="bi bi-arrow-right ms-1"></i></button>
+        </div>
+      </div>
+    </div><!-- /request -->
+
+    <!-- ── MY REQUESTS VIEW ── -->
+    <div class="view" id="view-my-requests">
+      <div class="card border overflow-hidden bg-white">
+        <div class="view-header">
+          <div class="view-header-title">My Requests</div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr><th>Project</th><th>Category</th><th>Submitted</th><th>Status Progress</th><th>IT Staff</th></tr>
+            </thead>
+            <tbody id="my-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /my-requests -->
+
+  </div><!-- /main -->
+</div><!-- /d-flex -->
+
+<!-- ══ Chat FAB ══ -->
+<div class="chatbox-fab" onclick="toggleChat()">
+  <i class="bi bi-chat-dots-fill text-white" style="font-size:18px;"></i>
+</div>
+
+<div class="chatbox" id="chatbox">
+  <div class="chat-header d-flex align-items-center gap-2">
+    <div class="chat-avatar">IT</div>
+    <div class="flex-grow-1">
+      <div style="font-size:13px;font-weight:600;color:#fff;">IT Multimedia Desk</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);">● Online</div>
+    </div>
+    <i class="bi bi-x text-white" style="font-size:18px;cursor:pointer;opacity:.6;" onclick="toggleChat()"></i>
+  </div>
+  <div class="chat-body" id="chat-body">
+    <div class="chat-msg system">Hello! How can we help you with your multimedia request?</div>
+  </div>
+  <div class="d-flex gap-2 p-2 border-top">
+    <input class="form-control form-control-sm" id="chat-in" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="btn btn-primary btn-sm px-3" onclick="sendChat()">
+      <i class="bi bi-send-fill"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="success-toast hidden" id="toast">
+  <i class="bi bi-check-circle-fill"></i>
+  Request submitted! Routed to IT Multimedia team.
+</div>
+
+<!-- Account Profile Modal -->
+<div class="modal fade modal-profile" id="profileModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-3">
+          <div class="acct-avatar-lg">JL</div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:#fff;font-family:'Syne',sans-serif;">Joyce Ann B. La Madrid</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5);">Secretary / Admin · Hospital Operations</div>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control form-control-sm" value="Joyce Ann B. La Madrid" readonly>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Role</label>
+            <input type="text" class="form-control form-control-sm" value="Secretary / Admin" readonly>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Division</label>
+            <input type="text" class="form-control form-control-sm" value="Hospital Operations" readonly>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Email</label>
+            <input type="text" class="form-control form-control-sm" value="j.lamadrid@cvmc.gov.ph" readonly>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Access Level</label>
+            <input type="text" class="form-control form-control-sm" value="Requestor — can submit and track multimedia requests" readonly>
+          </div>
+        </div>
+        <div class="mt-3 p-3 rounded-3" style="background:#f8fafc;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Account Statistics</div>
+          <div class="row g-2 text-center">
+            <div class="col-4">
+              <div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--navy);" id="modal-total">5</div>
+              <div style="font-size:10px;color:var(--text-muted);">Total Submitted</div>
+            </div>
+            <div class="col-4">
+              <div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--green);" id="modal-done">1</div>
+              <div style="font-size:10px;color:var(--text-muted);">Completed</div>
+            </div>
+            <div class="col-4">
+              <div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent);" id="modal-pending">4</div>
+              <div style="font-size:10px;color:var(--text-muted);">In Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top pt-3">
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary btn-sm">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const STATUSES = ['Requested','Approved','Scheduled','Ongoing','Done'];
+const STATUS_CLASS = {Requested:'badge-requested',Approved:'badge-approved',Scheduled:'badge-scheduled',Ongoing:'badge-ongoing',Done:'badge-done'};
+const STATUS_IDX = {Requested:0,Approved:1,Scheduled:2,Ongoing:3,Done:4};
+
+const sampleData = [
+  {date:'2025-07-01',division:'Nursing Service',unit:'Ward A',project:'World Breastfeeding Tarp',cat:'Graphic Design',target:'2025-07-05',status:'Done',staff:'-'},
+  {date:'2025-07-03',division:'Medical',unit:'OPD',project:'Hospital Website Update',cat:'Web & Digital Design',target:'2025-07-20',status:'Ongoing',staff:'Pending'},
+  {date:'2025-07-05',division:'Finance',unit:'Budget Office',project:'Q3 Presentation',cat:'Audio Visual Presentation',target:'2025-07-10',status:'Scheduled',staff:'IT Staff 2'},
+  {date:'2025-07-06',division:'OMCC',unit:'OMCC',project:'OMCC Newsletter Jul',cat:'Publication Design',target:'2025-07-15',status:'Approved',staff:'-'},
+  {date:'2025-07-07',division:'Allied Health',unit:'Lab',project:'Dept Logo Redesign',cat:'Branding & Identity',target:'2025-07-30',status:'Requested',staff:'—'},
+];
+
+let requests = [...sampleData];
+let selectedCat = '';
+
+// ── Account Dropdown ──
+function toggleAccountDropdown() {
+  const dropdown = document.getElementById('account-dropdown');
+  const btn = document.getElementById('user-btn');
+  const overlay = document.getElementById('overlay');
+  const isOpen = dropdown.classList.contains('show');
+  closeDropdowns();
+  if (!isOpen) {
+    dropdown.classList.add('show');
+    btn.classList.add('open');
+    overlay.classList.add('show');
+  }
+}
+
+function closeDropdowns() {
+  document.getElementById('account-dropdown').classList.remove('show');
+  document.getElementById('user-btn').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function openAccountModal() {
+  closeDropdowns();
+  // Update modal stats
+  const total = requests.length;
+  const done = requests.filter(r=>r.status==='Done').length;
+  document.getElementById('modal-total').textContent = total;
+  document.getElementById('modal-done').textContent = done;
+  document.getElementById('modal-pending').textContent = total - done;
+  const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+  modal.show();
+}
+
+// ── Stats ──
+function updateStats() {
+  const total = requests.length;
+  const done = requests.filter(r=>r.status==='Done').length;
+  const ongoing = requests.filter(r=>['Ongoing','Scheduled','Approved','Requested'].includes(r.status)).length;
+  const followup = requests.filter(r=>r.status==='Requested').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-ongoing').textContent = ongoing;
+  document.getElementById('stat-followup').textContent = followup;
+  document.getElementById('total-badge').textContent = total;
+}
+
+// ── Table ──
+function renderTable(data) {
+  const tb = document.getElementById('table-body');
+  tb.innerHTML = data.map(r=>`
+    <tr>
+      <td style="font-size:12px;color:var(--text-muted);">${r.date}</td>
+      <td><strong style="font-size:13px;">${r.division}</strong><br><span style="font-size:11px;color:var(--text-muted);">${r.unit}</span></td>
+      <td style="font-size:13px;font-weight:500;">${r.project}</td>
+      <td><span class="cat-pill">${r.cat}</span></td>
+      <td style="font-size:12px;color:var(--text-muted);">${r.target}</td>
+      <td><span class="status-badge ${STATUS_CLASS[r.status]}">${r.status}</span></td>
+      <td style="font-size:12px;">${r.staff}</td>
+      <td><button class="action-btn">View</button></td>
+    </tr>`).join('');
+
+  const mb = document.getElementById('my-table-body');
+  mb.innerHTML = data.map(r=>{
+    const si = STATUS_IDX[r.status];
+    const dots = STATUSES.map((s,i)=>`
+      <div class="prog-step">
+        ${i < STATUSES.length-1 ? `<div class="prog-line ${i<si?'done':''}"></div>` : ''}
+        <div class="prog-dot ${i<si?'done':i===si?'active':''}"></div>
+        <div class="prog-lbl">${s.split(' ')[0]}</div>
+      </div>`).join('');
+    return `<tr>
+      <td><strong>${r.project}</strong></td>
+      <td><span class="cat-pill">${r.cat}</span></td>
+      <td style="font-size:12px;color:var(--text-muted);">${r.date}</td>
+      <td style="min-width:200px;"><div class="progress-track">${dots}</div></td>
+      <td style="font-size:12px;">${r.staff}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable(status) {
+  const filtered = status ? requests.filter(r=>r.status===status) : requests;
+  renderTable(filtered);
+}
+
+function showView(id, navEl) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  const titles = {dashboard:'Dashboard', request:'New Request', 'my-requests':'My Requests'};
+  document.getElementById('page-title').textContent = titles[id]||id;
+  if(navEl) navEl.classList.add('active');
+  if(id==='request') {
+    document.getElementById('req-date').value = new Date().toISOString().split('T')[0];
+  }
+  renderTable(requests);
+  updateStats();
+}
+
+function selectCat(el, cat) {
+  document.querySelectorAll('.cat-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = cat;
+}
+
+function triggerUpload() {
+  const inp = document.createElement('input');
+  inp.type='file'; inp.multiple=true;
+  inp.onchange = e => { if(e.target.files.length) alert('File attached: '+e.target.files[0].name); };
+  inp.click();
+}
+
+function submitRequest() {
+  const title = document.getElementById('project-title').value.trim();
+  const div = document.getElementById('division').value;
+  const desc = document.getElementById('proj-desc').value.trim();
+  const target = document.getElementById('target-date').value;
+  if(!selectedCat||!title||!div||!desc||!target) {
+    alert('Please fill in all required fields and select a category.'); return;
+  }
+  const unit = document.getElementById('unit').value||div;
+  requests.unshift({ date:new Date().toISOString().split('T')[0], division:div, unit, project:title, cat:selectedCat, target, status:'Requested', staff:'—' });
+  const toast = document.getElementById('toast');
+  toast.classList.remove('hidden');
+  setTimeout(()=>toast.classList.add('hidden'), 3500);
+  selectedCat='';
+  document.querySelectorAll('.cat-option').forEach(o=>o.classList.remove('selected'));
+  ['project-title','unit','proj-desc','remarks','target-date'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('division').value='';
+  showView('dashboard', document.querySelector('.sidebar-link'));
+  document.querySelector('.sidebar-link').classList.add('active');
+}
+
+function toggleChat() {
+  document.getElementById('chatbox').classList.toggle('open');
+}
+
+const replies = [
+  'We received your message, we will get back to you shortly.',
+  'Please include your request number for faster assistance.',
+  'Our team will review and approve requests within 24 hours.',
+  'For urgent requests, please contact IT directly.',
+  'Thank you for reaching out!'
+];
+let rIdx = 0;
+function sendChat() {
+  const inp = document.getElementById('chat-in');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  const body = document.getElementById('chat-body');
+  body.innerHTML += `<div class="chat-msg user">${msg}</div>`;
+  inp.value = '';
+  setTimeout(()=>{
+    body.innerHTML += `<div class="chat-msg system">${replies[rIdx%replies.length]}</div>`;
+    rIdx++; body.scrollTop=body.scrollHeight;
+  }, 600);
+  body.scrollTop = body.scrollHeight;
+}
+
+// Init
+renderTable(requests);
+updateStats();
+</script>
+</body>
+</html>
