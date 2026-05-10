@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimedia Admin Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --blue:#1a56db; 
+  --blue-l:#e8f0fe; 
+  --blue-d:#1240a8;
+  --green:#0a7c3e; 
+  --green-l:#dcfce7;
+  --amber:#b45309; 
+  --amber-l:#fef3c7;
+  --red:#dc2626; 
+  --red-l:#fee2e2;
+  --purple:#7c3aed; 
+  --purple-l:#ede9fe;
+  --teal:#0d9488; 
+  --teal-l:#ccfbf1;
+  --border:#e5e7eb; 
+  --bg:#f0f4f8; 
+  --white:#fff;
+  --text:#111827; 
+  --muted:#6b7280; 
+  --muted2:#9ca3af;
+  --sidebar:230px; 
+  --header:58px;
+}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body{
+  font-family:'Plus Jakarta Sans',
+  sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.5;
+  height:100vh;
+  overflow:hidden;
+}
+#app{
+  display:flex;
+  height:100vh;
+}
+
+/* SIDEBAR */
+#sidebar{
+  width:var(--sidebar);
+  background:#0f172a;
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;}
+.sb-logo{
+  padding:20px 18px 16px;
+  border-bottom:1px solid #1e293b;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sb-logo-icon{
+  width:36px;
+  height:36px;
+  background:var(--blue);
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.sb-logo-icon svg{
+  width:20px;
+  height:20px;
+  fill:white;
+}
+.sb-logo-text{
+  font-size:13px;
+  font-weight:800;
+  color:#f8fafc;
+  line-height:1.2;
+  letter-spacing:-0.01em;
+}
+.sb-logo-sub{
+  font-size:10px;
+  color:#64748b;
+  font-weight:500;
+  letter-spacing:0.04em;
+}
+.sb-section{
+  padding:14px 10px 6px;
+}
+.sb-lbl{
+  font-size:10px;
+  font-weight:700;
+  color:#475569;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:0 8px 8px;
+}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  color:#94a3b8;
+  font-size:13px;
+  font-weight:500;
+  transition:all 0.15s;
+  margin-bottom:2px;
+  border:none;
+  background:none;
+  width:100%;
+  text-align:left;
+  font-family:inherit;
+}
+.nav-item svg{
+  width:16px;
+  height:16px;
+  flex-shrink:0;
+  opacity:0.7;
+}
+.nav-item:hover{
+  background:#1e293b;
+  color:#e2e8f0;
+}
+.nav-item.active{
+  background:#1e3a5f;
+  color:#93c5fd;
+}
+.nav-item.active svg{
+  opacity:1;
+}
+.nav-badge{
+  margin-left:auto;
+  background:#3b82f6;
+  color:white;
+  font-size:10px;
+  font-weight:700;
+  border-radius:20px;
+  padding:1px 7px;
+  min-width:20px;
+  text-align:center;
+}
+.sb-bottom{
+  margin-top:auto;
+  padding:14px 16px;
+  border-top:1px solid #1e293b;
+}
+.sb-user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sb-avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#1e3a5f;
+  color:#93c5fd;
+  font-weight:800;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.sb-uname{
+  font-size:12px;
+  font-weight:600;
+  color:#e2e8f0;
+}
+.sb-urole{
+  font-size:10px;
+  color:#64748b;
+}
+
+/* MAIN */
+#main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+#topbar{
+  height:var(--header);
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  flex-shrink:0;
+}
+.tb-title{
+  font-size:16px;
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:-0.02em;
+}
+.tb-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:1px;
+}
+.tb-right{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 14px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  border:1px solid var(--border);
+  background:var(--white);
+  color:var(--text);
+  transition:all 0.15s;
+  font-family:inherit;
+}
+.btn:hover{
+  background:#f9fafb;
+}
+.btn-primary{
+  background:var(--blue);
+  color:white;
+  border-color:var(--blue);
+}
+.btn-primary:hover{
+  background:var(--blue-d);
+}
+.btn svg{
+  width:14px;
+  height:14px;
+}
+#content{
+  flex:1;
+  overflow-y:auto;
+  padding:22px 24px;
+}
+
+/* VIEWS */
+.view{
+  display:none;}
+  .view.active{
+    display:block;}
+
+/* STAT CARDS */
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+.stat-card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 18px;
+  position:relative;
+  overflow:hidden;
+}
+.stat-card::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  border-radius:12px 12px 0 0;
+}
+.stat-card.blue::before{
+  background:var(--blue);
+}
+.stat-card.green::before{
+  background:var(--green);
+}
+.stat-card.amber::before{
+  background:var(--amber);
+}
+.stat-card.red::before{
+  background:var(--red);
+}
+.stat-card.purple::before{
+  background:var(--purple);
+}
+.stat-icon{
+  width:36px;
+  height:36px;
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:10px;
+}
+.stat-icon svg{
+  width:18px;
+  height:18px;
+}
+.stat-card.blue .stat-icon{
+  background:var(--blue-l);
+}
+.stat-card.blue .stat-icon svg{
+  stroke:var(--blue);
+}
+.stat-card.green .stat-icon{
+  background:var(--green-l);
+}
+.stat-card.green .stat-icon svg{
+  stroke:var(--green);
+}
+.stat-card.amber .stat-icon{
+  background:var(--amber-l);
+}
+.stat-card.amber .stat-icon svg{
+  stroke:var(--amber);
+}
+.stat-card.red .stat-icon{
+  background:var(--red-l);
+}
+.stat-card.red .stat-icon svg{
+  stroke:var(--red);
+}
+.stat-card.purple .stat-icon{
+  background:var(--purple-l);
+}
+.stat-card.purple .stat-icon svg{
+  stroke:var(--purple);
+}
+.stat-lbl{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  margin-bottom:4px;
+}
+.stat-val{
+  font-size:30px;
+  font-weight:800;
+  color:var(--text);
+  line-height:1;
+  letter-spacing:-0.02em;
+}
+.stat-sub{
+  font-size:11px;
+  color:var(--muted2);
+  margin-top:4px;
+}
+
+/* GRID LAYOUTS */
+.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+.three-col{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+.two-thirds{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+
+/* CARDS */
+.card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:16px;
+}
+.card-hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+.card-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+}
+.card-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+.chart-wrap{
+  position:relative;
+}
+
+/* TABLE */
+.tbl-wrap{
+  overflow-x:auto;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+thead tr{
+  border-bottom:1px solid var(--border);
+}
+th{
+  text-align:left;
+  padding:8px 12px;
+  font-size:10px;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.07em;
+  white-space:nowrap;
+}
+td{
+  padding:10px 12px;
+  border-bottom:1px solid #f3f4f6;
+  vertical-align:middle;
+}
+tbody tr:last-child td{
+  border-bottom:none;
+}
+tbody tr:hover{
+  background:#fafbfc;
+}
+
+/* BADGES */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.bdot{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.badge.requested{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+.badge.requested 
+.bdot{
+  background:#3b82f6;
+}
+.badge.approved{
+  background:#f0fdf4;
+  color:#166534;
+}
+.badge.approved 
+.bdot{
+  background:#22c55e;
+}
+.badge.scheduled{
+  background:#faf5ff;color:#7e22ce;
+}.badge.scheduled 
+.bdot{
+  background:#a855f7;
+}
+.badge.ongoing{
+  background:#fff7ed;
+  color:#9a3412;
+}
+.badge.ongoing 
+.bdot{
+  background:#f97316;
+}
+.badge.completed{
+  background:#f0fdf4;
+  color:#166534;
+}
+.badge.completed
+.bdot{
+  background:#16a34a;
+}
+.cat-pill{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:4px;
+  font-size:10px;
+  font-weight:700;
+  background:var(--blue-l);
+  color:var(--blue);
+}
+
+/* DIVISION BARS */
+.div-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+.div-name{
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+  width:110px;
+  flex-shrink:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.div-bar-wrap{
+  flex:1;
+  background:#f3f4f6;
+  border-radius:20px;
+  height:7px;
+  overflow:hidden;
+}
+.div-bar{
+  height:100%;
+  border-radius:20px;
+  transition:width 0.6s;
+}
+.div-count{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  min-width:24px;
+  text-align:right;
+}
+
+/* STATUS SELECT */
+.st-select{
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:600;
+  border:1px solid var(--border);
+  cursor:pointer;
+  font-family:inherit;
+  background:white;
+}
+
+/* FILTER BAR */
+.filter-bar{
+  display:flex;
+  gap:10px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.filter-bar input,.filter-bar select{
+  font-size:12px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:7px;
+  font-family:inherit;
+  color:var(--text);
+  background:white;
+  outline:none;
+}
+.filter-bar input:focus,.filter-bar select:focus{
+  border-color:var(--blue);
+}
+.filter-bar input{
+  min-width:200px;
+}
+
+/* MODAL */
+#overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:200;
+  align-items:center;
+  justify-content:center;
+}
+#overlay.open{
+  display:flex;
+}
+.modal{
+  background:var(--white);
+  border-radius:14px;
+  width:620px;
+  max-width:95vw;
+  max-height:88vh;
+  overflow-y:auto;
+  padding:24px;
+  position:relative;
+}
+.modal-hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.modal-title{
+  font-size:15px;
+  font-weight:800;
+  color:var(--text);
+}
+.modal-close{
+  cursor:pointer;
+  background:none;
+  border:none;
+  color:var(--muted);
+  padding:4px;
+  border-radius:6px;
+  display:flex;
+}
+.modal-close:hover{
+  background:#f3f4f6;
+}
+.detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+}
+.d-item .d-lbl{
+  font-size:10px;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  margin-bottom:3px;
+}
+.d-item .d-val{
+  font-size:13px;
+  font-weight:500;
+  color:var(--text);
+}
+.section-title{
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.tl{
+  list-style:none;
+  padding:0;
+  position:relative;
+}
+.tl::before{
+  content:'';
+  position:absolute;
+  left:9px;
+  top:8px;
+  bottom:0;
+  width:1px;
+  background:var(--border);
+}
+.tl-item{
+  display:flex;
+  gap:14px;
+  margin-bottom:14px;
+  position:relative;
+}
+.tl-dot{
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  background:white;
+  border:2px solid var(--border);
+  flex-shrink:0;
+  margin-top:1px;
+  z-index:1;
+}
+.tl-dot.done{
+  background:var(--green);
+  border-color:var(--green);
+}
+.tl-dot.cur{
+  background:var(--blue);
+  border-color:var(--blue);
+}
+.tl-lbl{
+  font-size:13px;
+  font-weight:600;
+}
+.tl-time{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+/* ASSIGN INLINE */
+.assign-input{
+  font-size:11px;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-family:inherit;
+  width:130px;
+  outline:none;
+}
+.assign-input:focus{
+  border-color:var(--blue);
+}
+
+/* TOAST */
+#toast{
+  position:fixed;
+  bottom:22px;
+  right:22px;
+  background:#0f172a;
+  color:white;
+  padding:11px 18px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:500;
+  z-index:999;
+  opacity:0;
+  transform:translateY(8px);
+  transition:all 0.25s;
+  pointer-events:none;
+}
+#toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* RECENT NEW badge */
+.new-dot{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--red);
+  margin-right:4px;
+  vertical-align:middle;
+}
+
+/* ACTIVITY FEED */
+.act-item{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  padding:10px 0;
+  border-bottom:1px solid #f3f4f6;
+}
+.act-item:last-child{
+  border-bottom:none;
+}
+.act-dot-wrap{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.act-dot-wrap svg{
+  width:14px;
+  height:14px;
+}
+.act-text{
+  font-size:12px;
+  color:var(--text);
+  line-height:1.4;
+}
+.act-text strong{
+  font-weight:700;
+}
+.act-time{
+  font-size:10px;
+  color:var(--muted2);
+  margin-top:2px;
+}
+
+::-webkit-scrollbar{
+  width:5px;
+  height:5px;
+}
+::-webkit-scrollbar-track{
+  background:transparent;
+}
+::-webkit-scrollbar-thumb{
+  background:var(--border);
+  border-radius:4px;
+  }
+</style>
+</head>
+
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v2H4V5zm0 4h16v2H4V9zm0 4h10v2H4v-2zm0 4h8v2H4v-2z"/></svg>
+    </div>
+    <div>
+      <div class="sb-logo-text">Multimedia</div>
+      <div class="sb-logo-sub">ADMIN DASHBOARD</div>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-lbl">Overview</div>
+    <button class="nav-item active" onclick="switchView('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="switchView('requests',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12h6M9 16h4M5 5h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+      All Requests
+      <span class="nav-badge" id="badge-all">0</span>
+    </button>
+    <button class="nav-item" onclick="switchView('pending',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Pending / New
+      <span class="nav-badge" id="badge-pending" style="background:#ef4444;">0</span>
+    </button>
+    <button class="nav-item" onclick="switchView('tracker',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18"/></svg>
+      Task Tracker
+    </button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-lbl">Filter by Division</div>
+    <button class="nav-item" onclick="filterByDiv('',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></svg>
+      All Divisions
+    </button>
+    <button class="nav-item" onclick="filterByDiv('OMCC',this)">OMCC</button>
+    <button class="nav-item" onclick="filterByDiv('HOPSS',this)">HOPSS</button>
+    <button class="nav-item" onclick="filterByDiv('FINANCE',this)">Finance</button>
+    <button class="nav-item" onclick="filterByDiv('NURSING SERVICE',this)">Nursing Service</button>
+    <button class="nav-item" onclick="filterByDiv('MEDICAL SERVICE',this)">Medical Service</button>
+    <button class="nav-item" onclick="filterByDiv('ALLIED HEALTH',this)">Allied Health</button>
+  </div>
+
+  <div class="sb-bottom" style="position:relative;">
+    <!-- Account Popup -->
+    <div id="account-menu" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden;box-shadow:0 -8px 24px rgba(0,0,0,0.4);z-index:100;">
+      <div style="padding:12px 14px;border-bottom:1px solid #334155;">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Signed in as</div>
+        <div style="font-size:13px;font-weight:700;color:#f1f5f9;" id="menu-uname">ADMIN</div>
+        <div style="font-size:11px;color:#64748b;" id="menu-urole">Administrator</div>
+      </div>
+      <div style="padding:6px;">
+        <button onclick="doLogout()" style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;border:none;background:none;color:#f87171;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background='transparent'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Log Out
+        </button>
+      </div>
+    </div>
+    <div class="sb-user" id="sb-account-btn" onclick="toggleAccountMenu()" style="cursor:pointer;border-radius:8px;padding:6px 8px;margin:-6px -8px;transition:background 0.15s;" onmouseenter="this.style.background='#1e293b'" onmouseleave="this.style.background='transparent'">
+      <div class="sb-avatar" id="sb-avatar-initials">AD</div>
+      <div style="flex:1;">
+        <div class="sb-uname" id="sb-uname-text">ADMIN</div>
+        <div class="sb-urole" id="sb-urole-text">Admin</div>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;transition:transform 0.2s;" id="sb-chevron"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+</nav>
+
+
+
+
+
+<!-- MAIN -->
+<div id="main">
+  <header id="topbar">
+    <div class="tb-left">
+      <div class="tb-title" id="pg-title">Dashboard</div>
+      <div class="tb-sub" id="pg-sub">Multimedia Request System — Admin View</div>
+    </div>
+    <div class="tb-right">
+      <div style="font-size:12px;color:var(--muted);background:#f3f4f6;padding:6px 12px;border-radius:7px;">
+        📅 <span id="today-date"></span>
+      </div>
+
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- DASHBOARD VIEW -->
+    <div id="view-dashboard" class="view active">
+
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12h6M9 16h4M5 5h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>
+          <div class="stat-lbl">Total Requests</div>
+          <div class="stat-val" id="s-total">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <div class="stat-lbl">Requested</div>
+          <div class="stat-val" id="s-req">0</div>
+          <div class="stat-sub">Awaiting approval</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+          <div class="stat-lbl">In Progress</div>
+          <div class="stat-val" id="s-prog">0</div>
+          <div class="stat-sub">Scheduled + Ongoing</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="stat-lbl">Completed</div>
+          <div class="stat-val" id="s-done">0</div>
+          <div class="stat-sub">Finished tasks</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg></div>
+          <div class="stat-lbl">Overdue</div>
+          <div class="stat-val" id="s-overdue">0</div>
+          <div class="stat-sub">Past target date</div>
+        </div>
+      </div>
+
+      <div class="two-thirds">
+
+        <!-- Status Chart -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-hdr">
+            <div><div class="card-title">Requests by Status</div><div class="card-sub">Current distribution</div></div>
+          </div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="chart-status"></canvas>
+          </div>
+        </div>
+        <!-- Division Breakdown -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-hdr">
+            <div><div class="card-title">By Division</div><div class="card-sub">Request volume</div></div>
+          </div>
+          <div id="div-bars"></div>
+        </div>
+      </div>
+
+      <div style="height:16px;"></div>
+
+      <div class="two-col">
+
+        <!-- Category Chart -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-hdr">
+            <div><div class="card-title">By Category</div></div>
+          </div>
+          <div class="chart-wrap" style="height:200px;">
+            <canvas id="chart-cat"></canvas>
+          </div>
+        </div>
+        <!-- Recent Activity -->
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-hdr">
+            <div><div class="card-title">Recent Activity</div></div>
+          </div>
+          <div id="activity-feed"></div>
+        </div>
+      </div>
+
+      <div style="height:16px;"></div>
+
+      <!-- Recent Requests Table -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-hdr">
+          <div><div class="card-title">Latest Requests</div></div>
+          <button class="btn" onclick="switchView('requests',null)" style="font-size:11px;padding:5px 10px;">View all →</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Division</th><th>Project</th><th>Type</th><th>Target</th><th>Assigned</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="dash-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL REQUESTS VIEW -->
+    <div id="view-requests" class="view">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-hdr">
+          <div><div class="card-title" id="req-view-title">All Requests</div></div>
+          <div style="font-size:11px;color:var(--muted);" id="req-view-count"></div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" placeholder="Search project, division..." id="f-search" oninput="applyFilters()">
+          <select id="f-status" onchange="applyFilters()">
+            <option value="">All Status</option>
+            <option>Requested</option><option>Approved</option><option>Scheduled</option><option>Ongoing</option><option>Completed</option>
+          </select>
+          <select id="f-div" onchange="applyFilters()">
+            <option value="">All Divisions</option>
+            <option>OMCC</option><option>HOPSS</option><option>FINANCE</option>
+            <option>NURSING SERVICE</option><option>MEDICAL SERVICE</option><option>ALLIED HEALTH</option>
+          </select>
+          <select id="f-cat" onchange="applyFilters()">
+            <option value="">All Categories</option>
+            <option>Graphic Design</option><option>Audio-Visual Presentation</option>
+            <option>Photography and Editing</option><option>Publication Design</option>
+            <option>Web and Digital Design</option><option>Branding and Identity</option>
+          </select>
+          <button class="btn" onclick="clearFilters()" style="font-size:11px;">Clear</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Date Req.</th><th>Division</th><th>Unit</th><th>Project</th><th>Category</th><th>Type</th><th>Target</th><th>Status</th><th>Assign To</th><th>Detail</th>
+            </tr></thead>
+            <tbody id="all-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENDING VIEW -->
+    <div id="view-pending" class="view">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-hdr">
+          <div><div class="card-title">Pending & New Requests</div><div class="card-sub">Requests awaiting approval or scheduling</div></div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Division</th><th>Project</th><th>Type</th><th>Target</th><th>Requestor</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="pending-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRACKER VIEW -->
+    <div id="view-tracker" class="view">
+      <div class="stats-row" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card green"><div class="stat-lbl">Completed</div><div class="stat-val" id="t-done">0</div></div>
+        <div class="stat-card amber"><div class="stat-lbl">Ongoing</div><div class="stat-val" id="t-ong">0</div></div>
+        <div class="stat-card red"><div class="stat-lbl">Not Started</div><div class="stat-val" id="t-ns">0</div></div>
+        <div class="stat-card blue"><div class="stat-lbl">Total</div><div class="stat-val" id="t-tot">0</div></div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-hdr">
+          <div><div class="card-title">Task Management Tracker 2026</div></div>
+          <div style="font-size:11px;color:var(--muted);">Editable — update status and staff inline</div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Date Req.</th><th>Division</th><th>Section</th><th>Project</th><th>Type</th><th>Category</th><th>Month</th><th>Target</th><th>Assigned</th><th>Status</th>
+            </tr></thead>
+            <tbody id="tracker-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div id="overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">Request Detail</div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
+
+<script>
+const DIVS = ['OMCC','HOPSS','FINANCE','NURSING SERVICE','MEDICAL SERVICE','ALLIED HEALTH'];
+const CATS = ['Graphic Design','Audio-Visual Presentation','Photography and Editing','Publication Design','Web and Digital Design','Branding and Identity'];
+const STATUSES = ['Requested','Approved','Scheduled','Ongoing','Completed'];
+const DIV_COLORS = {'OMCC':'#3b82f6','HOPSS':'#8b5cf6','FINANCE':'#f59e0b','NURSING SERVICE':'#ec4899','MEDICAL SERVICE':'#10b981','ALLIED HEALTH':'#f97316'};
+
+let requests = JSON.parse(localStorage.getItem('mm_requests_v2') || '[]');
+
+let divFilter = '';
+let chartStatus = null, chartCat = null;
+
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-PH',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
+
+function save() { localStorage.setItem('mm_requests_v2', JSON.stringify(requests)); }
+
+function save() { localStorage.setItem('mm_requests_v2', JSON.stringify(requests)); }
+
+function badge(status) {
+  const cls = status.toLowerCase().replace(' ','');
+  return `<span class="badge ${cls}"><span class="bdot"></span>${status}</span>`;
+}
+
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+  const map = {
+    dashboard:['Dashboard','Multimedia Request System — Admin View'],
+    requests:['All Requests','Manage and update all incoming requests'],
+    pending:['Pending & New','Requests awaiting approval or scheduling'],
+    tracker:['Task Tracker 2026','Full task management tracker'],
+  };
+  const t = map[name]||[name,''];
+  document.getElementById('pg-title').textContent = t[0];
+  document.getElementById('pg-sub').textContent = t[1];
+  if (name==='requests') renderAll();
+  if (name==='pending') renderPending();
+  if (name==='tracker') renderTracker();
+  if (name==='dashboard') renderDashboard();
+}
+
+function filterByDiv(div, btn) {
+  divFilter = div;
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (div) {
+    document.getElementById('f-div').value = div;
+    applyFilters();
+    switchView('requests', null);
+  } else {
+    document.getElementById('f-div').value = '';
+    applyFilters();
+    switchView('requests', null);
+  }
+}
+
+function refreshBadges() {
+  const all = requests.length;
+  const pend = requests.filter(r=>['Requested','Approved'].includes(r.status)).length;
+  document.getElementById('badge-all').textContent = all;
+  document.getElementById('badge-pending').textContent = pend;
+}
+
+function renderDashboard() {
+  const today = new Date().toISOString().split('T')[0];
+  const total = requests.length;
+  const req = requests.filter(r=>r.status==='Requested').length;
+  const prog = requests.filter(r=>['Approved','Scheduled','Ongoing'].includes(r.status)).length;
+  const done = requests.filter(r=>r.status==='Completed').length;
+  const overdue = requests.filter(r=>r.status!=='Completed'&&r.target<today).length;
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-req').textContent = req;
+  document.getElementById('s-prog').textContent = prog;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-overdue').textContent = overdue;
+
+  // Status doughnut
+  const statusCounts = STATUSES.map(s=>requests.filter(r=>r.status===s).length);
+  const statusColors = ['#3b82f6','#22c55e','#a855f7','#f97316','#16a34a'];
+  if (chartStatus) chartStatus.destroy();
+  chartStatus = new Chart(document.getElementById('chart-status'), {
+    type: 'doughnut',
+    data: { labels: STATUSES, datasets: [{ data: statusCounts, backgroundColor: statusColors, borderWidth: 2, borderColor: '#fff', hoverBorderColor: '#fff' }] },
+    options: { cutout: '65%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Plus Jakarta Sans', size: 11 }, boxWidth: 10, padding: 12 } } } }
+  });
+
+  // Division bars
+  const maxDiv = Math.max(...DIVS.map(d=>requests.filter(r=>r.division===d).length), 1);
+  document.getElementById('div-bars').innerHTML = DIVS.map(d => {
+    const cnt = requests.filter(r=>r.division===d).length;
+    const pct = Math.round(cnt/maxDiv*100);
+    const col = DIV_COLORS[d]||'#3b82f6';
+    return `<div class="div-item">
+      <div class="div-name">${d}</div>
+      <div class="div-bar-wrap"><div class="div-bar" style="width:${pct}%;background:${col};"></div></div>
+      <div class="div-count">${cnt}</div>
+    </div>`;
+  }).join('');
+
+  // Category bar chart
+  const catCounts = CATS.map(c=>requests.filter(r=>r.category===c).length);
+  const catLabels = CATS.map(c=>c.split(' ').slice(0,2).join(' '));
+  if (chartCat) chartCat.destroy();
+  chartCat = new Chart(document.getElementById('chart-cat'), {
+    type: 'bar',
+    data: { labels: catLabels, datasets: [{ data: catCounts, backgroundColor: '#1a56db22', borderColor: '#1a56db', borderWidth: 1.5, borderRadius: 5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { color: '#f3f4f6' } }, x: { ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { display: false } } } }
+  });
+
+  // Activity feed
+  const recent = [...requests].sort((a,b)=>b.id-a.id).slice(0,6);
+  document.getElementById('activity-feed').innerHTML = recent.map(r => {
+    const col = r.status==='Completed'?'#dcfce7':r.status==='Requested'?'#eff6ff':r.status==='Ongoing'?'#fff7ed':'#faf5ff';
+    const icol = r.status==='Completed'?'#16a34a':r.status==='Requested'?'#1d4ed8':r.status==='Ongoing'?'#9a3412':'#7e22ce';
+    return `<div class="act-item">
+      <div class="act-dot-wrap" style="background:${col};">
+        <svg viewBox="0 0 24 24" fill="none" stroke="${icol}" stroke-width="2"><path d="M9 12h6M9 16h4M5 5h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>
+      </div>
+      <div>
+        <div class="act-text"><strong>${r.division}</strong> — ${r.project}</div>
+        <div class="act-time">${r.date} · ${badge(r.status)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Dashboard table
+  const tbody = document.getElementById('dash-tbody');
+  const latest = [...requests].sort((a,b)=>b.id-a.id).slice(0,8);
+  tbody.innerHTML = latest.map(r=>`
+    <tr style="cursor:pointer;" onclick="openDetail(${r.id})">
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td style="font-size:12px;color:var(--blue);">${r.assigned||'—'}</td>
+      <td>${badge(r.status)}</td>
+      <td><button class="btn" style="font-size:11px;padding:3px 8px;" onclick="event.stopPropagation();openDetail(${r.id})">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderAll() {
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = (document.getElementById('f-search')?.value||'').toLowerCase();
+  const st = document.getElementById('f-status')?.value||'';
+  const div = document.getElementById('f-div')?.value||'';
+  const cat = document.getElementById('f-cat')?.value||'';
+  const filtered = requests.filter(r=>{
+    return (!q||r.project.toLowerCase().includes(q)||r.division.toLowerCase().includes(q)||r.type.toLowerCase().includes(q)||r.unit.toLowerCase().includes(q))
+      &&(!st||r.status===st)&&(!div||r.division===div)&&(!cat||r.category===cat);
+  });
+  const sorted = [...filtered].sort((a,b)=>b.id-a.id);
+  document.getElementById('req-view-count').textContent = `${sorted.length} request${sorted.length!==1?'s':''}`;
+  document.getElementById('all-tbody').innerHTML = sorted.length ? sorted.map(r=>`
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="font-size:12px;">${r.unit||'—'}</td>
+      <td>${r.project}</td>
+      <td><span class="cat-pill">${r.category.split(' ')[0]}</span></td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td>
+        <select class="st-select" onchange="updateStatus(${r.id},this.value)">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="assign-input" value="${r.assigned||''}" placeholder="Assign staff" onchange="updateAssigned(${r.id},this.value)"></td>
+      <td><button class="btn" style="font-size:11px;padding:3px 8px;" onclick="openDetail(${r.id})">Detail</button></td>
+    </tr>
+  `).join('') : `<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:24px;">No requests found.</td></tr>`;
+}
+
+function clearFilters() {
+  ['f-search','f-status','f-div','f-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  applyFilters();
+}
+
+function renderPending() {
+  const list = requests.filter(r=>['Requested','Approved'].includes(r.status)).sort((a,b)=>a.target.localeCompare(b.target));
+  document.getElementById('pending-tbody').innerHTML = list.length ? list.map(r=>`
+    <tr style="cursor:pointer;" onclick="openDetail(${r.id})">
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td>${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;${r.target<new Date().toISOString().split('T')[0]?'color:var(--red);font-weight:700;':''}">${r.target}</td>
+      <td style="font-size:12px;">${r.requestor}</td>
+      <td>${badge(r.status)}</td>
+      <td style="display:flex;gap:6px;">
+        ${r.status==='Requested'?`<button class="btn btn-primary" style="font-size:11px;padding:3px 10px;" onclick="event.stopPropagation();quickStatus(${r.id},'Approved')">Approve</button>`:''}
+        ${r.status==='Approved'?`<button class="btn btn-primary" style="font-size:11px;padding:3px 10px;" onclick="event.stopPropagation();quickStatus(${r.id},'Scheduled')">Schedule</button>`:''}
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px;">No pending requests.</td></tr>`;
+}
+
+function renderTracker() {
+  const sorted = [...requests].sort((a,b)=>b.id-a.id);
+  document.getElementById('t-tot').textContent = sorted.length;
+  document.getElementById('t-done').textContent = sorted.filter(r=>r.status==='Completed').length;
+  document.getElementById('t-ong').textContent = sorted.filter(r=>r.status==='Ongoing').length;
+  document.getElementById('t-ns').textContent = sorted.filter(r=>r.status==='Requested').length;
+  document.getElementById('tracker-tbody').innerHTML = sorted.map((r,i)=>`
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${i+1}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="font-size:12px;">${r.unit||'—'}</td>
+      <td>${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td><span class="cat-pill" style="font-size:10px;">${r.category.split(' ')[0]}</span></td>
+      <td style="font-size:12px;">${r.month||'—'}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td><input class="assign-input" value="${r.assigned||''}" placeholder="Staff" onchange="updateAssigned(${r.id},this.value)"></td>
+      <td>
+        <select class="st-select" onchange="updateStatus(${r.id},this.value)">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateStatus(id, status) {
+  const r = requests.find(x=>x.id===id);
+  if (r) { r.status=status; save(); refreshBadges(); renderDashboard(); showToast('Status → '+status); }
+}
+
+function quickStatus(id, status) {
+  updateStatus(id, status);
+  renderPending();
+}
+
+function updateAssigned(id, val) {
+  const r = requests.find(x=>x.id===id);
+  if (r) { r.assigned=val; save(); showToast('Assigned: '+val); }
+}
+
+function openDetail(id) {
+  const r = requests.find(x=>x.id===id);
+  if (!r) return;
+  const curIdx = STATUSES.indexOf(r.status);
+  const tl = STATUSES.map((s,i)=>{
+    const done=i<curIdx, cur=i===curIdx;
+    return `<li class="tl-item">
+      <div class="tl-dot ${done?'done':cur?'cur':''}"></div>
+      <div><div class="tl-lbl" style="color:${cur?'var(--blue)':done?'var(--green)':'var(--muted)'}">${s}</div>
+      <div class="tl-time">${cur?'Current status':done?'✓ Completed':'Pending'}</div></div>
+    </li>`;
+  }).join('');
+
+  document.getElementById('modal-title').textContent = `#${String(r.id).padStart(3,'0')} — ${r.project}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="detail-grid">
+      <div class="d-item"><div class="d-lbl">Division</div><div class="d-val">${r.division}</div></div>
+      <div class="d-item"><div class="d-lbl">Unit / Section</div><div class="d-val">${r.unit||'—'}</div></div>
+      <div class="d-item"><div class="d-lbl">Category</div><div class="d-val">${r.category}</div></div>
+      <div class="d-item"><div class="d-lbl">Type</div><div class="d-val">${r.type}</div></div>
+      <div class="d-item"><div class="d-lbl">Requested By</div><div class="d-val">${r.requestor}</div></div>
+      <div class="d-item"><div class="d-lbl">Date Requested</div><div class="d-val">${r.date}</div></div>
+      <div class="d-item"><div class="d-lbl">Target Date</div><div class="d-val">${r.target}</div></div>
+      <div class="d-item"><div class="d-lbl">Assigned To</div><div class="d-val">${r.assigned||'Not yet assigned'}</div></div>
+      <div class="d-item" style="grid-column:1/-1"><div class="d-lbl">Current Status</div><div class="d-val" style="margin-top:4px;">${badge(r.status)}</div></div>
+      <div class="d-item" style="grid-column:1/-1"><div class="d-lbl">Project Description</div><div class="d-val" style="white-space:pre-wrap;margin-top:2px;">${r.description}</div></div>
+      ${r.remarks?`<div class="d-item" style="grid-column:1/-1"><div class="d-lbl">Remarks</div><div class="d-val">${r.remarks}</div></div>`:''}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:16px;">
+      <div class="section-title">Progress Timeline</div>
+      <ul class="tl">${tl}</ul>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:16px;">
+      <div class="section-title">Quick Update</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+        <select class="st-select" id="modal-status" style="font-size:13px;padding:7px 10px;">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <input class="assign-input" id="modal-assign" value="${r.assigned||''}" placeholder="Assign staff" style="font-size:13px;padding:7px 10px;width:160px;">
+        <button class="btn btn-primary" onclick="saveModalUpdate(${r.id})">Save Changes</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function saveModalUpdate(id) {
+  const status = document.getElementById('modal-status').value;
+  const assigned = document.getElementById('modal-assign').value;
+  const r = requests.find(x=>x.id===id);
+  if (r) { r.status=status; r.assigned=assigned; save(); refreshBadges(); renderDashboard(); renderAll(); renderTracker(); showToast('Request updated!'); closeModal(); }
+}
+
+function closeModal(e) {
+  if (!e||e.target===document.getElementById('overlay')) document.getElementById('overlay').classList.remove('open');
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── ACCOUNT MENU ──────────────────────────────────────────────────────
+let accountMenuOpen = false;
+
+function toggleAccountMenu() {
+  if (accountMenuOpen) { closeAccountMenu(); } else { openAccountMenu(); }
+}
+function openAccountMenu() {
+  document.getElementById('account-menu').style.display = 'block';
+  document.getElementById('sb-chevron').style.transform = 'rotate(180deg)';
+  accountMenuOpen = true;
+}
+function closeAccountMenu() {
+  document.getElementById('account-menu').style.display = 'none';
+  document.getElementById('sb-chevron').style.transform = 'rotate(0deg)';
+  accountMenuOpen = false;
+}
+function doLogout() {
+  closeAccountMenu();
+  showToast('You have been logged out.');
+}
+
+document.addEventListener('click', function(e) {
+  if (accountMenuOpen && !document.getElementById('sb-account-btn').contains(e.target) && !document.getElementById('account-menu').contains(e.target)) {
+    closeAccountMenu();
+  }
+});
+// ──────────────────────────────────────────────────────────────────────
+
+refreshBadges();
+renderDashboard();
+</script>
+</body>
+</html>
