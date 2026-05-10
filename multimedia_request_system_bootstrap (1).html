@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multimedia Admin Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --sidebar-width: 230px;
+  --topbar-height: 58px;
+  --sidebar-bg: #0f172a;
+  --sidebar-border: #1e293b;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #1e3a5f;
+  --sidebar-text: #94a3b8;
+  --sidebar-active-text: #93c5fd;
+}
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; font-size: 14px; overflow: hidden; height: 100vh; }
+
+/* SIDEBAR */
+#sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.sb-logo { padding: 18px 16px; border-bottom: 1px solid var(--sidebar-border); }
+.sb-logo-icon { width: 36px; height: 36px; background: #1a56db; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-logo-text { font-size: 13px; font-weight: 800; color: #f8fafc; line-height: 1.2; }
+.sb-logo-sub { font-size: 10px; color: #64748b; font-weight: 500; letter-spacing: .04em; }
+.sb-section-label { font-size: 10px; font-weight: 700; color: #475569; letter-spacing: .1em; text-transform: uppercase; padding: 14px 16px 6px; }
+.nav-item-btn {
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px;
+  border-radius: 8px; cursor: pointer; color: var(--sidebar-text);
+  font-size: 13px; font-weight: 500; transition: all .15s;
+  border: none; background: none; width: 100%; text-align: left;
+  font-family: inherit; margin-bottom: 2px;
+}
+.nav-item-btn:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+.nav-item-btn.active { background: var(--sidebar-active); color: var(--sidebar-active-text); }
+.nav-item-btn i { font-size: 15px; flex-shrink: 0; opacity: .75; }
+.nav-item-btn.active i { opacity: 1; }
+
+/* USER SECTION */
+.sb-bottom { margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--sidebar-border); position: relative; }
+.sb-user-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 6px 8px; border-radius: 8px; cursor: pointer;
+  border: none; background: none; transition: background .15s; text-align: left; font-family: inherit;
+}
+.sb-user-btn:hover { background: var(--sidebar-hover); }
+.sb-avatar { width: 32px; height: 32px; border-radius: 50%; background: #1e3a5f; color: #93c5fd; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sb-uname { font-size: 12px; font-weight: 600; color: #e2e8f0; }
+.sb-urole { font-size: 10px; color: #64748b; }
+.account-popup {
+  display: none; position: absolute; bottom: calc(100% + 6px); left: 10px; right: 10px;
+  background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 -8px 24px rgba(0,0,0,.4); z-index: 999;
+}
+.account-popup.show { display: block; }
+.logout-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 14px; border: none; background: none; color: #f87171;
+  font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; text-align: left;
+  border-radius: 0; transition: background .15s;
+}
+.logout-btn:hover { background: #334155; }
+
+/* TOPBAR */
+#topbar { height: var(--topbar-height); background: #fff; border-bottom: 1px solid #e5e7eb; flex-shrink: 0; }
+.topbar-title { font-size: 16px; font-weight: 800; color: #111827; letter-spacing: -.02em; }
+.topbar-sub { font-size: 11px; color: #6b7280; }
+
+/* CONTENT */
+#content { flex: 1; overflow-y: auto; padding: 22px 24px; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* STAT CARDS */
+.stat-card { border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; padding: 16px 18px; position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 12px 12px 0 0; }
+.stat-card.blue::before { background: #1a56db; }
+.stat-card.amber::before { background: #b45309; }
+.stat-card.purple::before { background: #7c3aed; }
+.stat-card.green::before { background: #0a7c3e; }
+.stat-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 17px; }
+.stat-card.blue .stat-icon { background: #e8f0fe; color: #1a56db; }
+.stat-card.amber .stat-icon { background: #fef3c7; color: #b45309; }
+.stat-card.purple .stat-icon { background: #ede9fe; color: #7c3aed; }
+.stat-card.green .stat-icon { background: #dcfce7; color: #0a7c3e; }
+.stat-lbl { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.stat-val { font-size: 30px; font-weight: 800; color: #111827; line-height: 1; letter-spacing: -.02em; }
+.stat-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+/* CARDS */
+.dash-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+.card-title-sm { font-size: 13px; font-weight: 700; color: #111827; }
+.card-sub-sm { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
+.dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dash-table thead tr { border-bottom: 1px solid #e5e7eb; }
+.dash-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .07em; white-space: nowrap; }
+.dash-table td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+.dash-table tbody tr:last-child td { border-bottom: none; }
+.dash-table tbody tr:hover { background: #fafbfc; cursor: pointer; }
+
+/* BADGES */
+.status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.bdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.status-badge.requested { background: #eff6ff; color: #1d4ed8; }
+.status-badge.requested .bdot { background: #3b82f6; }
+.status-badge.approved { background: #f0fdf4; color: #166534; }
+.status-badge.approved .bdot { background: #22c55e; }
+.status-badge.scheduled { background: #faf5ff; color: #7e22ce; }
+.status-badge.scheduled .bdot { background: #a855f7; }
+.status-badge.ongoing { background: #fff7ed; color: #9a3412; }
+.status-badge.ongoing .bdot { background: #f97316; }
+.status-badge.completed { background: #f0fdf4; color: #166534; }
+.status-badge.completed .bdot { background: #16a34a; }
+.cat-pill { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; background: #e8f0fe; color: #1a56db; }
+
+/* DIV BARS */
+.div-bar-wrap { flex: 1; background: #f3f4f6; border-radius: 20px; height: 7px; overflow: hidden; }
+.div-bar { height: 100%; border-radius: 20px; transition: width .6s; }
+
+/* FILTER */
+.filter-input { font-size: 12px; padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 7px; font-family: inherit; color: #111827; background: white; outline: none; }
+.filter-input:focus { border-color: #1a56db; box-shadow: none; }
+
+/* STATUS SELECT */
+.st-select { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid #e5e7eb; cursor: pointer; font-family: inherit; background: white; outline: none; }
+
+/* ASSIGN INPUT */
+.assign-input { font-size: 11px; padding: 4px 8px; border: 1px solid #e5e7eb; border-radius: 6px; font-family: inherit; width: 130px; outline: none; }
+.assign-input:focus { border-color: #1a56db; }
+
+/* TIMELINE */
+.tl { list-style: none; padding: 0; position: relative; }
+.tl::before { content: ''; position: absolute; left: 9px; top: 8px; bottom: 0; width: 1px; background: #e5e7eb; }
+.tl-item { display: flex; gap: 14px; margin-bottom: 14px; position: relative; }
+.tl-dot { width: 19px; height: 19px; border-radius: 50%; background: white; border: 2px solid #e5e7eb; flex-shrink: 0; margin-top: 1px; z-index: 1; }
+.tl-dot.done { background: #0a7c3e; border-color: #0a7c3e; }
+.tl-dot.cur { background: #1a56db; border-color: #1a56db; }
+
+/* ACTIVITY */
+.act-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+.act-item:last-child { border-bottom: none; }
+.act-dot-wrap { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
+
+/* MODAL */
+.modal-title-custom { font-size: 15px; font-weight: 800; color: #111827; }
+.detail-lbl { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+.detail-val { font-size: 13px; font-weight: 500; color: #111827; }
+
+/* TOAST */
+#toast { position: fixed; bottom: 22px; right: 22px; background: #0f172a; color: white; padding: 11px 18px; border-radius: 9px; font-size: 13px; font-weight: 500; z-index: 9999; opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none; }
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="d-flex" style="height:100vh;overflow:hidden;">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <!-- Logo -->
+  <div class="sb-logo d-flex align-items-center gap-2">
+    <div class="sb-logo-icon">
+      <i class="bi bi-play-btn-fill text-white" style="font-size:16px;"></i>
+    </div>
+    <div>
+      <div class="sb-logo-text">Multimedia</div>
+      <div class="sb-logo-sub">ADMIN DASHBOARD</div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="px-2 mt-2">
+    <div class="sb-section-label">Overview</div>
+    <button class="nav-item-btn active" onclick="switchView('dashboard',this)">
+      <i class="bi bi-grid-1x2"></i> Dashboard
+    </button>
+    <button class="nav-item-btn" onclick="switchView('requests',this)">
+      <i class="bi bi-file-text"></i> All Requests
+      <span class="badge rounded-pill bg-primary ms-auto" id="badge-all" style="font-size:10px;">0</span>
+    </button>
+    <button class="nav-item-btn" onclick="switchView('pending',this)">
+      <i class="bi bi-clock"></i> Pending / New
+      <span class="badge rounded-pill bg-danger ms-auto" id="badge-pending" style="font-size:10px;">0</span>
+    </button>
+    <button class="nav-item-btn" onclick="switchView('tracker',this)">
+      <i class="bi bi-table"></i> Task Tracker
+    </button>
+
+    <div class="sb-section-label mt-2">Filter by Division</div>
+    <button class="nav-item-btn" onclick="filterByDiv('',this)">
+      <i class="bi bi-people"></i> All Divisions
+    </button>
+    <button class="nav-item-btn" onclick="filterByDiv('OMCC',this)">OMCC</button>
+    <button class="nav-item-btn" onclick="filterByDiv('HOPSS',this)">HOPSS</button>
+    <button class="nav-item-btn" onclick="filterByDiv('FINANCE',this)">Finance</button>
+    <button class="nav-item-btn" onclick="filterByDiv('NURSING SERVICE',this)">Nursing Service</button>
+    <button class="nav-item-btn" onclick="filterByDiv('MEDICAL SERVICE',this)">Medical Service</button>
+    <button class="nav-item-btn" onclick="filterByDiv('ALLIED HEALTH',this)">Allied Health</button>
+  </div>
+
+  <!-- Account -->
+  <div class="sb-bottom">
+    <div class="account-popup" id="account-popup">
+      <div class="px-3 py-2 border-bottom" style="border-color:#334155!important;">
+        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Signed in as</div>
+        <div style="font-size:13px;font-weight:700;color:#f1f5f9;">ADMIN</div>
+        <div style="font-size:11px;color:#64748b;">Administrator</div>
+      </div>
+      <div class="p-1">
+        <button class="logout-btn" onclick="doLogout()">
+          <i class="bi bi-box-arrow-right"></i> Log Out
+        </button>
+      </div>
+    </div>
+    <button class="sb-user-btn" id="sb-account-btn" onclick="toggleAccountMenu()">
+      <div class="sb-avatar">AD</div>
+      <div class="flex-grow-1">
+        <div class="sb-uname">ADMIN</div>
+        <div class="sb-urole">Admin</div>
+      </div>
+      <i class="bi bi-chevron-up" id="sb-chevron" style="color:#475569;font-size:11px;transition:transform .2s;"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="d-flex flex-column flex-grow-1" style="overflow:hidden;">
+
+  <!-- Topbar -->
+  <header id="topbar" class="d-flex align-items-center justify-content-between px-4 border-bottom bg-white flex-shrink-0">
+    <div>
+      <div class="topbar-title" id="pg-title">Dashboard</div>
+      <div class="topbar-sub" id="pg-sub">Multimedia Request System — Admin View</div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-light text-secondary border" style="font-size:12px;font-weight:500;padding:6px 12px;">
+        <i class="bi bi-calendar3 me-1"></i><span id="today-date"></span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div id="content">
+
+    <!-- ── DASHBOARD VIEW ── -->
+    <div id="view-dashboard" class="view active">
+
+      <!-- Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-3">
+          <div class="stat-card blue">
+            <div class="stat-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="stat-lbl">Total Requests</div>
+            <div class="stat-val" id="s-total">0</div>
+            <div class="stat-sub">All time</div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card amber">
+            <div class="stat-icon"><i class="bi bi-clock"></i></div>
+            <div class="stat-lbl">Requested</div>
+            <div class="stat-val" id="s-req">0</div>
+            <div class="stat-sub">Awaiting approval</div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card purple">
+            <div class="stat-icon"><i class="bi bi-list-task"></i></div>
+            <div class="stat-lbl">In Progress</div>
+            <div class="stat-val" id="s-prog">0</div>
+            <div class="stat-sub">Scheduled + Ongoing</div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="stat-card green">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-lbl">Completed</div>
+            <div class="stat-val" id="s-done">0</div>
+            <div class="stat-sub">Finished tasks</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row g-3 mb-3">
+        <div class="col-8">
+          <div class="dash-card h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="card-title-sm">Requests by Status</div>
+                <div class="card-sub-sm">Current distribution</div>
+              </div>
+            </div>
+            <div style="height:220px;position:relative;">
+              <canvas id="chart-status"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="dash-card h-100">
+            <div class="card-title-sm mb-3">By Division</div>
+            <div id="div-bars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <div class="dash-card h-100">
+            <div class="card-title-sm mb-3">By Category</div>
+            <div style="height:200px;position:relative;">
+              <canvas id="chart-cat"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="dash-card h-100">
+            <div class="card-title-sm mb-3">Recent Activity</div>
+            <div id="activity-feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest Requests Table -->
+      <div class="dash-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="card-title-sm">Latest Requests</div>
+          <button class="btn btn-sm btn-outline-secondary" onclick="switchView('requests',null)" style="font-size:11px;">View all →</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="dash-table">
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Division</th><th>Project</th><th>Type</th><th>Target</th><th>Assigned</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="dash-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ALL REQUESTS VIEW ── -->
+    <div id="view-requests" class="view">
+      <div class="dash-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="card-title-sm" id="req-view-title">All Requests</div>
+          <span class="text-muted" style="font-size:11px;" id="req-view-count"></span>
+        </div>
+        <!-- Filters -->
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <input type="text" class="filter-input" placeholder="Search project, division..." id="f-search" oninput="applyFilters()" style="min-width:200px;">
+          <select class="filter-input" id="f-status" onchange="applyFilters()">
+            <option value="">All Status</option>
+            <option>Requested</option><option>Approved</option><option>Scheduled</option><option>Ongoing</option><option>Completed</option>
+          </select>
+          <select class="filter-input" id="f-div" onchange="applyFilters()">
+            <option value="">All Divisions</option>
+            <option>OMCC</option><option>HOPSS</option><option>FINANCE</option>
+            <option>NURSING SERVICE</option><option>MEDICAL SERVICE</option><option>ALLIED HEALTH</option>
+          </select>
+          <select class="filter-input" id="f-cat" onchange="applyFilters()">
+            <option value="">All Categories</option>
+            <option>Graphic Design</option><option>Audio-Visual Presentation</option>
+            <option>Photography and Editing</option><option>Publication Design</option>
+            <option>Web and Digital Design</option><option>Branding and Identity</option>
+          </select>
+          <button class="btn btn-sm btn-outline-secondary" onclick="clearFilters()" style="font-size:12px;">Clear</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="dash-table">
+            <thead><tr>
+              <th>#</th><th>Date Req.</th><th>Division</th><th>Unit</th><th>Project</th><th>Category</th><th>Type</th><th>Target</th><th>Status</th><th>Assign To</th><th>Detail</th>
+            </tr></thead>
+            <tbody id="all-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PENDING VIEW ── -->
+    <div id="view-pending" class="view">
+      <div class="dash-card">
+        <div class="mb-3">
+          <div class="card-title-sm">Pending & New Requests</div>
+          <div class="card-sub-sm">Requests awaiting approval or scheduling</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="dash-table">
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Division</th><th>Project</th><th>Type</th><th>Target</th><th>Requestor</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="pending-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRACKER VIEW ── -->
+    <div id="view-tracker" class="view">
+      <div class="row g-3 mb-3">
+        <div class="col-3"><div class="stat-card green"><div class="stat-lbl">Completed</div><div class="stat-val" id="t-done">0</div></div></div>
+        <div class="col-3"><div class="stat-card amber"><div class="stat-lbl">Ongoing</div><div class="stat-val" id="t-ong">0</div></div></div>
+        <div class="col-3"><div class="stat-card" style="border-top:3px solid #dc2626;"><div class="stat-lbl">Not Started</div><div class="stat-val" id="t-ns">0</div></div></div>
+        <div class="col-3"><div class="stat-card blue"><div class="stat-lbl">Total</div><div class="stat-val" id="t-tot">0</div></div></div>
+      </div>
+      <div class="dash-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="card-title-sm">Task Management Tracker 2026</div>
+          <span class="text-muted" style="font-size:11px;">Editable — update status and staff inline</span>
+        </div>
+        <div class="tbl-wrap">
+          <table class="dash-table">
+            <thead><tr>
+              <th>#</th><th>Date Req.</th><th>Division</th><th>Section</th><th>Project</th><th>Type</th><th>Category</th><th>Month</th><th>Target</th><th>Assigned</th><th>Status</th>
+            </tr></thead>
+            <tbody id="tracker-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ DETAIL MODAL ═══ -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:14px;border:none;">
+      <div class="modal-header border-bottom" style="padding:20px 24px;">
+        <h5 class="modal-title modal-title-custom" id="modal-title">Request Detail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const DIVS = ['OMCC','HOPSS','FINANCE','NURSING SERVICE','MEDICAL SERVICE','ALLIED HEALTH'];
+const CATS = ['Graphic Design','Audio-Visual Presentation','Photography and Editing','Publication Design','Web and Digital Design','Branding and Identity'];
+const STATUSES = ['Requested','Approved','Scheduled','Ongoing','Completed'];
+const DIV_COLORS = {'OMCC':'#3b82f6','HOPSS':'#8b5cf6','FINANCE':'#f59e0b','NURSING SERVICE':'#ec4899','MEDICAL SERVICE':'#10b981','ALLIED HEALTH':'#f97316'};
+
+let requests = JSON.parse(localStorage.getItem('mm_requests_v2') || '[]');
+let divFilter = '';
+let chartStatus = null, chartCat = null;
+let detailModal = null;
+
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-PH',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
+
+function save() { localStorage.setItem('mm_requests_v2', JSON.stringify(requests)); }
+
+function badge(status) {
+  const cls = status.toLowerCase().replace(' ','');
+  return `<span class="status-badge ${cls}"><span class="bdot"></span>${status}</span>`;
+}
+
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (btn) { document.querySelectorAll('.nav-item-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+  const map = {
+    dashboard: ['Dashboard','Multimedia Request System — Admin View'],
+    requests: ['All Requests','Manage and update all incoming requests'],
+    pending: ['Pending & New','Requests awaiting approval or scheduling'],
+    tracker: ['Task Tracker 2026','Full task management tracker'],
+  };
+  const t = map[name] || [name, ''];
+  document.getElementById('pg-title').textContent = t[0];
+  document.getElementById('pg-sub').textContent = t[1];
+  if (name === 'requests') renderAll();
+  if (name === 'pending') renderPending();
+  if (name === 'tracker') renderTracker();
+  if (name === 'dashboard') renderDashboard();
+}
+
+function filterByDiv(div, btn) {
+  divFilter = div;
+  document.querySelectorAll('.nav-item-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('f-div').value = div;
+  applyFilters();
+  switchView('requests', null);
+}
+
+function refreshBadges() {
+  document.getElementById('badge-all').textContent = requests.length;
+  document.getElementById('badge-pending').textContent = requests.filter(r => ['Requested','Approved'].includes(r.status)).length;
+}
+
+function renderDashboard() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('s-total').textContent = requests.length;
+  document.getElementById('s-req').textContent = requests.filter(r => r.status === 'Requested').length;
+  document.getElementById('s-prog').textContent = requests.filter(r => ['Approved','Scheduled','Ongoing'].includes(r.status)).length;
+  document.getElementById('s-done').textContent = requests.filter(r => r.status === 'Completed').length;
+
+  // Status doughnut
+  const statusCounts = STATUSES.map(s => requests.filter(r => r.status === s).length);
+  const statusColors = ['#3b82f6','#22c55e','#a855f7','#f97316','#16a34a'];
+  if (chartStatus) chartStatus.destroy();
+  chartStatus = new Chart(document.getElementById('chart-status'), {
+    type: 'doughnut',
+    data: { labels: STATUSES, datasets: [{ data: statusCounts, backgroundColor: statusColors, borderWidth: 2, borderColor: '#fff' }] },
+    options: { cutout: '65%', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { font: { family: 'Plus Jakarta Sans', size: 11 }, boxWidth: 10, padding: 12 } } } }
+  });
+
+  // Division bars
+  const maxDiv = Math.max(...DIVS.map(d => requests.filter(r => r.division === d).length), 1);
+  document.getElementById('div-bars').innerHTML = DIVS.map(d => {
+    const cnt = requests.filter(r => r.division === d).length;
+    const pct = Math.round(cnt / maxDiv * 100);
+    const col = DIV_COLORS[d] || '#3b82f6';
+    return `<div class="d-flex align-items-center gap-2 mb-2">
+      <div style="font-size:12px;font-weight:600;color:#111827;width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d}</div>
+      <div class="div-bar-wrap"><div class="div-bar" style="width:${pct}%;background:${col};"></div></div>
+      <div style="font-size:12px;font-weight:700;color:#111827;min-width:20px;text-align:right;">${cnt}</div>
+    </div>`;
+  }).join('');
+
+  // Category bar chart
+  const catCounts = CATS.map(c => requests.filter(r => r.category === c).length);
+  const catLabels = CATS.map(c => c.split(' ').slice(0,2).join(' '));
+  if (chartCat) chartCat.destroy();
+  chartCat = new Chart(document.getElementById('chart-cat'), {
+    type: 'bar',
+    data: { labels: catLabels, datasets: [{ data: catCounts, backgroundColor: '#1a56db22', borderColor: '#1a56db', borderWidth: 1.5, borderRadius: 5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { color: '#f3f4f6' } }, x: { ticks: { font: { family: 'Plus Jakarta Sans', size: 10 } }, grid: { display: false } } } }
+  });
+
+  // Activity feed
+  const recent = [...requests].sort((a,b) => b.id - a.id).slice(0,6);
+  const actColors = { Completed: ['#dcfce7','#16a34a'], Requested: ['#eff6ff','#1d4ed8'], Ongoing: ['#fff7ed','#9a3412'], default: ['#faf5ff','#7e22ce'] };
+  document.getElementById('activity-feed').innerHTML = recent.map(r => {
+    const [bg, ic] = actColors[r.status] || actColors.default;
+    return `<div class="act-item">
+      <div class="act-dot-wrap" style="background:${bg};color:${ic};"><i class="bi bi-file-earmark-text"></i></div>
+      <div>
+        <div style="font-size:12px;color:#111827;"><strong>${r.division}</strong> — ${r.project}</div>
+        <div style="font-size:10px;color:#9ca3af;margin-top:2px;">${r.date} · ${badge(r.status)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Dashboard table
+  const latest = [...requests].sort((a,b) => b.id - a.id).slice(0,8);
+  document.getElementById('dash-tbody').innerHTML = latest.map(r => `
+    <tr onclick="openDetail(${r.id})">
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:#6b7280;">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td style="font-size:12px;color:#1a56db;">${r.assigned||'—'}</td>
+      <td>${badge(r.status)}</td>
+      <td><button class="btn btn-sm btn-outline-secondary" style="font-size:11px;padding:2px 8px;" onclick="event.stopPropagation();openDetail(${r.id})">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderAll() { applyFilters(); }
+
+function applyFilters() {
+  const q = (document.getElementById('f-search')?.value||'').toLowerCase();
+  const st = document.getElementById('f-status')?.value||'';
+  const div = document.getElementById('f-div')?.value||'';
+  const cat = document.getElementById('f-cat')?.value||'';
+  const filtered = requests.filter(r =>
+    (!q || r.project.toLowerCase().includes(q) || r.division.toLowerCase().includes(q) || r.type.toLowerCase().includes(q) || (r.unit||'').toLowerCase().includes(q))
+    && (!st || r.status === st) && (!div || r.division === div) && (!cat || r.category === cat)
+  );
+  const sorted = [...filtered].sort((a,b) => b.id - a.id);
+  document.getElementById('req-view-count').textContent = `${sorted.length} request${sorted.length !== 1 ? 's' : ''}`;
+  document.getElementById('all-tbody').innerHTML = sorted.length ? sorted.map(r => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:#6b7280;">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="font-size:12px;">${r.unit||'—'}</td>
+      <td>${r.project}</td>
+      <td><span class="cat-pill">${r.category.split(' ')[0]}</span></td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td>
+        <select class="st-select" onchange="updateStatus(${r.id},this.value)">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="assign-input" value="${r.assigned||''}" placeholder="Assign staff" onchange="updateAssigned(${r.id},this.value)"></td>
+      <td><button class="btn btn-sm btn-outline-secondary" style="font-size:11px;padding:2px 8px;" onclick="openDetail(${r.id})">Detail</button></td>
+    </tr>
+  `).join('') : `<tr><td colspan="11" class="text-center text-muted py-4">No requests found.</td></tr>`;
+}
+
+function clearFilters() {
+  ['f-search','f-status','f-div','f-cat'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  applyFilters();
+}
+
+function renderPending() {
+  const list = requests.filter(r => ['Requested','Approved'].includes(r.status)).sort((a,b) => a.target.localeCompare(b.target));
+  document.getElementById('pending-tbody').innerHTML = list.length ? list.map(r => `
+    <tr onclick="openDetail(${r.id})">
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:#6b7280;">#${String(r.id).padStart(3,'0')}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td>${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td style="font-size:12px;${r.target<new Date().toISOString().split('T')[0]?'color:#dc2626;font-weight:700;':''}">${r.target}</td>
+      <td style="font-size:12px;">${r.requestor}</td>
+      <td>${badge(r.status)}</td>
+      <td class="d-flex gap-1">
+        ${r.status==='Requested'?`<button class="btn btn-sm btn-primary" style="font-size:11px;" onclick="event.stopPropagation();quickStatus(${r.id},'Approved')">Approve</button>`:''}
+        ${r.status==='Approved'?`<button class="btn btn-sm btn-primary" style="font-size:11px;" onclick="event.stopPropagation();quickStatus(${r.id},'Scheduled')">Schedule</button>`:''}
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="9" class="text-center text-muted py-4">No pending requests.</td></tr>`;
+}
+
+function renderTracker() {
+  const sorted = [...requests].sort((a,b) => b.id - a.id);
+  document.getElementById('t-tot').textContent = sorted.length;
+  document.getElementById('t-done').textContent = sorted.filter(r => r.status === 'Completed').length;
+  document.getElementById('t-ong').textContent = sorted.filter(r => r.status === 'Ongoing').length;
+  document.getElementById('t-ns').textContent = sorted.filter(r => r.status === 'Requested').length;
+  document.getElementById('tracker-tbody').innerHTML = sorted.map((r,i) => `
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:#6b7280;">${i+1}</td>
+      <td style="font-size:12px;">${r.date}</td>
+      <td style="font-size:12px;font-weight:600;">${r.division}</td>
+      <td style="font-size:12px;">${r.unit||'—'}</td>
+      <td>${r.project}</td>
+      <td style="font-size:12px;">${r.type}</td>
+      <td><span class="cat-pill" style="font-size:10px;">${r.category.split(' ')[0]}</span></td>
+      <td style="font-size:12px;">${r.month||'—'}</td>
+      <td style="font-size:12px;">${r.target}</td>
+      <td><input class="assign-input" value="${r.assigned||''}" placeholder="Staff" onchange="updateAssigned(${r.id},this.value)"></td>
+      <td>
+        <select class="st-select" onchange="updateStatus(${r.id},this.value)">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateStatus(id, status) {
+  const r = requests.find(x => x.id === id);
+  if (r) { r.status = status; save(); refreshBadges(); renderDashboard(); showToast('Status → ' + status); }
+}
+
+function quickStatus(id, status) { updateStatus(id, status); renderPending(); }
+
+function updateAssigned(id, val) {
+  const r = requests.find(x => x.id === id);
+  if (r) { r.assigned = val; save(); showToast('Assigned: ' + val); }
+}
+
+function openDetail(id) {
+  const r = requests.find(x => x.id === id);
+  if (!r) return;
+  const curIdx = STATUSES.indexOf(r.status);
+  const tl = STATUSES.map((s,i) => {
+    const done = i < curIdx, cur = i === curIdx;
+    return `<li class="tl-item">
+      <div class="tl-dot ${done?'done':cur?'cur':''}"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:${cur?'#1a56db':done?'#0a7c3e':'#6b7280'}">${s}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px;">${cur?'Current status':done?'✓ Completed':'Pending'}</div>
+      </div>
+    </li>`;
+  }).join('');
+
+  document.getElementById('modal-title').textContent = `#${String(r.id).padStart(3,'0')} — ${r.project}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="row g-3 mb-3">
+      <div class="col-6"><div class="detail-lbl">Division</div><div class="detail-val">${r.division}</div></div>
+      <div class="col-6"><div class="detail-lbl">Unit / Section</div><div class="detail-val">${r.unit||'—'}</div></div>
+      <div class="col-6"><div class="detail-lbl">Category</div><div class="detail-val">${r.category}</div></div>
+      <div class="col-6"><div class="detail-lbl">Type</div><div class="detail-val">${r.type}</div></div>
+      <div class="col-6"><div class="detail-lbl">Requested By</div><div class="detail-val">${r.requestor}</div></div>
+      <div class="col-6"><div class="detail-lbl">Date Requested</div><div class="detail-val">${r.date}</div></div>
+      <div class="col-6"><div class="detail-lbl">Target Date</div><div class="detail-val">${r.target}</div></div>
+      <div class="col-6"><div class="detail-lbl">Assigned To</div><div class="detail-val">${r.assigned||'Not yet assigned'}</div></div>
+      <div class="col-12"><div class="detail-lbl">Current Status</div><div class="mt-1">${badge(r.status)}</div></div>
+      <div class="col-12"><div class="detail-lbl">Project Description</div><div class="detail-val" style="white-space:pre-wrap;">${r.description}</div></div>
+      ${r.remarks?`<div class="col-12"><div class="detail-lbl">Remarks</div><div class="detail-val">${r.remarks}</div></div>`:''}
+    </div>
+    <div class="border-top pt-3 mb-3">
+      <div class="detail-lbl mb-2">Progress Timeline</div>
+      <ul class="tl">${tl}</ul>
+    </div>
+    <div class="border-top pt-3">
+      <div class="detail-lbl mb-2">Quick Update</div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <select class="form-select form-select-sm" id="modal-status" style="width:auto;">
+          ${STATUSES.map(s=>`<option ${r.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <input class="form-control form-control-sm" id="modal-assign" value="${r.assigned||''}" placeholder="Assign staff" style="width:180px;">
+        <button class="btn btn-sm btn-primary" onclick="saveModalUpdate(${r.id})">Save Changes</button>
+      </div>
+    </div>
+  `;
+  if (!detailModal) detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+  detailModal.show();
+}
+
+function saveModalUpdate(id) {
+  const status = document.getElementById('modal-status').value;
+  const assigned = document.getElementById('modal-assign').value;
+  const r = requests.find(x => x.id === id);
+  if (r) { r.status = status; r.assigned = assigned; save(); refreshBadges(); renderDashboard(); renderAll(); renderTracker(); showToast('Request updated!'); detailModal.hide(); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── ACCOUNT MENU ──────────────────────────────────────────────────────
+let accountMenuOpen = false;
+function toggleAccountMenu() { accountMenuOpen ? closeAccountMenu() : openAccountMenu(); }
+function openAccountMenu() {
+  document.getElementById('account-popup').classList.add('show');
+  document.getElementById('sb-chevron').style.transform = 'rotate(0deg)';
+  accountMenuOpen = true;
+}
+function closeAccountMenu() {
+  document.getElementById('account-popup').classList.remove('show');
+  document.getElementById('sb-chevron').style.transform = 'rotate(180deg)';
+  accountMenuOpen = false;
+}
+function doLogout() { closeAccountMenu(); showToast('You have been logged out.'); }
+document.addEventListener('click', function(e) {
+  if (accountMenuOpen && !document.getElementById('sb-account-btn').contains(e.target) && !document.getElementById('account-popup').contains(e.target)) closeAccountMenu();
+});
+// ──────────────────────────────────────────────────────────────────────
+
+refreshBadges();
+renderDashboard();
+</script>
+</body>
+</html>
