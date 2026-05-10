@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request System | Multimedia System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1a56db; --bg: #f0f4f8; --sidebar: #0f172a; --border: #e5e7eb; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); height: 100vh; display: flex; overflow: hidden; margin: 0; }
+        
+        /* SIDEBAR */
+        #sidebar { width: 260px; background: var(--sidebar); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        
+        /* HEADER VISIBILITY FIX */
+        .sidebar-header h5 { color: #ffffff; }
+        .sidebar-header small { color: rgba(255, 255, 255, 0.7) !important; }
+
+        .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 10px; margin: 4px 15px; cursor: pointer; transition: 0.2s; text-decoration: none; display: flex; align-items: center; font-weight: 500; }
+        .nav-link:hover { background: #1e293b; color: white; }
+        .nav-link.active { background: var(--primary); color: white; }
+
+        /* USER PROFILE (BOTTOM) */
+        .sidebar-footer { margin-top: auto; padding: 20px; border-top: 1px solid #1e293b; background: #0f172a; }
+        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .user-avatar { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; flex-shrink: 0; }
+        .user-info { overflow: hidden; }
+        .user-name { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0; min-height: 1.2em; }
+        .user-role { font-size: 11px; color: #64748b; margin: 0; }
+        .logout-btn { color: #f87171; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; cursor: pointer; }
+        .logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
+
+        /* MAIN CONTENT */
+        #main-content { flex: 1; overflow-y: auto; padding: 40px; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* STAT CARDS */
+        .stat-card { background: white; padding: 22px; border-radius: 16px; border: 1px solid var(--border); position: relative; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 16px 16px 0 0; }
+        .blue::before { background: #1a56db; } .amber::before { background: #b45309; } .purple::before { background: #7c3aed; } .green::before { background: #0a7c3e; }
+
+        .card-custom { background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        .form-control, .form-select { border-radius: 10px; padding: 12px; border: 1px solid #d1d5db; font-size: 14px; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1); }
+    </style>
+</head>
+<body>
+
+<nav id="sidebar">
+    <div class="sidebar-header p-4 border-bottom border-secondary mb-3 text-center">
+        <h5 class="fw-bold mb-0">Multimedia</h5>
+        <small class="fw-bold">Request System</small>
+    </div>
+    
+    <div class="nav-link active" onclick="switchView('dashboard', this)">
+        <i class="bi bi-grid-1x2-fill me-3"></i> My Requests
+    </div>
+    <div class="nav-link" onclick="switchView('new-request', this)">
+        <i class="bi bi-plus-square-fill me-3"></i> New Request
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar"></div>
+            <div class="user-info">
+                <p class="user-name"></p>
+                <p class="user-role"></p>
+            </div>
+        </div>
+        <form action="" method="POST">
+            <button type="submit" class="logout-btn">
+                <i class="bi bi-power"></i> Sign Out
+            </button>
+        </form>
+    </div>
+</nav>
+
+<main id="main-content">
+    <section id="view-dashboard" class="view-section active">
+        <h3 class="fw-bold mb-4">Dashboard Queues</h3>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card blue">
+                    <div class="small fw-bold text-muted mb-2">TOTAL</div>
+                    <h2 class="fw-bold mb-0">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card amber">
+                    <div class="small fw-bold text-muted mb-2">REQUESTED</div>
+                    <h2 class="fw-bold mb-0">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card purple">
+                    <div class="small fw-bold text-muted mb-2">IN PROGRESS</div>
+                    <h2 class="fw-bold mb-0">0</h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card green">
+                    <div class="small fw-bold text-muted mb-2">COMPLETED</div>
+                    <h2 class="fw-bold mb-0">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-custom">
+            <div class="table-responsive p-3">
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-muted small fw-bold">
+                            <th>ID</th><th>PROJECT</th><th>CATEGORY</th><th>TARGET</th><th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-folder2-open d-block fs-2 mb-2"></i>
+                                No requests found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-new-request" class="view-section">
+        <div class="card-custom mx-auto p-5" style="max-width: 800px;">
+            <h3 class="fw-bold mb-4">Create New Request</h3>
+            <form action="" method="POST">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">REQUESTOR NAME</label>
+                        <input type="text" name="requestor_name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">TARGET DATE</label>
+                        <input type="date" name="target_date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">PROJECT TITLE</label>
+                    <input type="text" name="project_title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">CATEGORY</label>
+                    <select name="category" class="form-select" required>
+                        <option value="" selected disabled></option>
+                        <option value="graphic_design">Graphic Design</option>
+                        <option value="audio_visual">Audio-Visual Presentation</option>
+                        <option value="photography">Photography and Editing</option>
+                        <option value="publication">Publication Design</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">DESCRIPTION</label>
+                    <textarea name="description" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">Submit Request</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+<script>
+    function switchView(viewId, el) {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        el.classList.add('active');
+    }
+</script>
+</body>
+</html>
