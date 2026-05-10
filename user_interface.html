@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Division's Portal | Multimedia System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1a56db; --bg: #f0f4f8; --sidebar: #0f172a; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); height: 100vh; display: flex; overflow: hidden; }
+        
+        /* SIDEBAR */
+        #sidebar { width: 250px; background: var(--sidebar); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 8px; margin: 4px 12px; cursor: pointer; transition: 0.2s; text-decoration: none; display: flex; align-items: center; }
+        .nav-link:hover { background: #000000; color: white; }
+        .nav-link.active { background: var(--primary); color: white; }
+
+        /* USER PROFILE SECTION */
+        .sidebar-footer { margin-top: auto; padding: 15px; border-top: 1px solid #e3eaf7; background: #0f172a; }
+        .user-profile { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 10px; transition: 0.2s; }
+        .user-avatar { width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: white; }
+        .user-info { flex-grow: 1; overflow: hidden; }
+        .user-name { font-size: 13px; font-weight: 700; color: #f8fafc; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-role { font-size: 11px; color: #64748b; margin-bottom: 0; }
+        .logout-btn { color: #f87171; text-decoration: none; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-top: 10px; padding: 5px 8px; border-radius: 5px; transition: 0.2s; }
+        .logout-btn:hover { background: rgba(248, 113, 113, 0.1); }
+
+        /* MAIN CONTENT */
+        #main-content { flex: 1; overflow-y: auto; padding: 40px; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stat-card { background: white; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0; }
+        .form-card { background: white; padding: 35px; border-radius: 15px; border: 1px solid #e2e8f0; max-width: 800px; }
+        .badge-status { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .requested { background: #eff6ff; color: #1d4ed8; }
+        .ongoing { background: #fff7ed; color: #9a3412; }
+        .completed { background: #f0fdf4; color: #166534; }
+
+        img {
+  --s: 280px; /* image size */
+  --b: 5px; /* border thickness */
+  --c: #C02942; /* border color */
+  --f: 1; /* initial scale */
+  
+  width: var(--s);
+  aspect-ratio: 1;
+  padding-top: calc(var(--s)/5);
+  cursor: pointer;
+  border-radius: 0 0 999px 999px;
+  --_g: 50%/calc(100%/var(--f)) 100% no-repeat content-box;
+  --_o: calc((1/var(--f) - 1)*var(--s)/2 - var(--b));
+  outline: var(--b) solid var(--c);
+  outline-offset: var(--_o);
+  background: 
+    radial-gradient(
+      circle closest-side,
+      #ECD078 calc(99% - var(--b)),var(--c) calc(100% - var(--b)) 99%,#0000
+     ) var(--_g);
+  -webkit-mask:
+    linear-gradient(#000 0 0) no-repeat
+     50% calc(1px - var(--_o)) / calc(100%/var(--f) - 2*var(--b) - 2px) 50%,
+    radial-gradient(circle closest-side,#000 99%,#0000) var(--_g);
+  transform: scale(var(--f));
+  transition: .5s;
+}
+img:hover {
+  --f: 1.35; /* hover scale */
+}
+​
+​
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  background: #E0E4CC;
+}
+    </style>
+</head>
+<body>
+
+<nav id="sidebar">
+    <div class="p-4 border-bottom border-secondary mb-3 text-center">
+        <h5 class="fw-bold mb-0">Multimedia</h5>
+        <small class="text-muted" id="display-division">DIVISION PORTAL</small>
+    </div>
+    
+    <div class="nav-link active" onclick="switchView('dashboard', this)">
+        <i class="bi bi-collection-fill me-2"></i> My Requests
+    </div>
+    <div class="nav-link" onclick="switchView('new-request', this)">
+        <i class="bi bi-plus-circle-fill me-2"></i> New Request
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar" id="user-initials">OMCC</div>
+            <div class="user-info">
+                <p class="user-name" id="user-name-display">OMCC SECRETARY</p>
+                <p class="user-role">IT Center </p>
+            </div>
+        </div>
+        <a href="javascript:void(0)" class="logout-btn" onclick="doLogout()">
+            <i class="bi bi-box-arrow-left"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<main id="main-content">
+    <section id="view-dashboard" class="view-section active">
+        <h3 class="fw-extrabold mb-4">Request History</h3>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="text-muted small fw-bold">TOTAL PROJECTS</div>
+                    <h2 class="mb-0 fw-bold" id="count-total">0</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="text-muted small fw-bold">PENDING APPROVAL</div>
+                    <h2 class="mb-0 fw-bold text-primary" id="count-pending">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="table-responsive p-3">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Project</th>
+                            <th>Category</th>
+                            <th>Target Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-new-request" class="view-section">
+        <div class="form-card mx-auto">
+            <h3 class="fw-bold mb-1">Create New Request</h3>
+            <p class="text-muted mb-4">Submit your project details to the multimedia team.</p>
+            
+            <form id="requestForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold">FULL NAME</label>
+                        <input type="text" id="requestor" class="form-control py-2" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label small fw-bold">TARGET DEADLINE</label>
+                        <input type="date" id="target" class="form-control py-2" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">PROJECT TITLE</label>
+                    <input type="text" id="project" class="form-control py-2" placeholder="e.g. Health Awareness Poster" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">CATEGORY</label>
+                    <select id="category" class="form-select py-2" required>
+                        <option>Graphic Design</option>
+                        <option>Audio-Visual Presentation</option>
+                        <option>Photography and Editing</option>
+                        <option>Publication Design</option>
+                        <option>Web and Digital Design </option>
+                        <option>Branding and Identity</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">DESCRIPTION / REMARKS</label>
+                    <textarea id="description" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">Submit Project Request</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+<script>
+    const USER_DIV = "OMCC"; 
+    const DB_KEY = 'mm_requests_v2';
+    
+    // 1. Idle Timer Logic (10 Minutes)
+    let idleTime = 0;
+    const idleLimit = 10; // Minutes
+
+    // Reset timer on any user activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeydown = resetTimer;
+    document.onclick = resetTimer;
+    document.onscroll = resetTimer;
+
+    function resetTimer() {
+        idleTime = 0;
+    }
+
+    // Check idle status every 1 minute
+    setInterval(function() {
+        idleTime++;
+        if (idleTime >= idleLimit) {
+            alert("Session expired due to inactivity.");
+            doLogout();
+        }
+    }, 60000); 
+
+    function doLogout() {
+        // Since you are using Django, this would usually be: window.location.href = "/logout/";
+        // For your current static UI test, we just alert and simulate a redirect:
+        alert("Logging out...");
+        window.location.href = "login.html"; // Replace with your actual login page URL
+    }
+
+    // 2. View Switching Logic
+    function switchView(id, el) {
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('view-' + id).classList.add('active');
+        el.classList.add('active');
+        
+        if(id === 'dashboard') loadHistory();
+    }
+
+    // 3. Load Only This Division's History
+    function loadHistory() {
+        const data = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        const myData = data.filter(r => r.division === USER_DIV);
+        
+        const table = document.getElementById('history-table');
+        table.innerHTML = myData.map(r => `
+            <tr>
+                <td class="text-muted small">#${String(r.id).slice(-4)}</td>
+                <td class="fw-bold">${r.project}</td>
+                <td><span class="badge bg-light text-dark border">${r.category.split(' ')[0]}</span></td>
+                <td>${r.target}</td>
+                <td><span class="badge-status ${r.status.toLowerCase()}">${r.status}</span></td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" class="text-center py-4">No requests found.</td></tr>';
+
+        document.getElementById('count-total').textContent = myData.length;
+        document.getElementById('count-pending').textContent = myData.filter(x => x.status === 'Requested').length;
+    }
+
+    // 4. Submit New Request
+    document.getElementById('requestForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        
+        const entry = {
+            id: Date.now(),
+            date: new Date().toISOString().split('T')[0],
+            division: USER_DIV,
+            requestor: document.getElementById('requestor').value,
+            project: document.getElementById('project').value,
+            category: document.getElementById('category').value,
+            target: document.getElementById('target').value,
+            description: document.getElementById('description').value,
+            status: 'Requested',
+            assigned: '',
+            type: 'New Request'
+        };
+
+        data.push(entry);
+        localStorage.setItem(DB_KEY, JSON.stringify(data));
+        
+        alert('Request submitted successfully!');
+        this.reset();
+        switchView('dashboard', document.querySelector('.nav-link'));
+    });
+
+    // Initialize UI
+    document.getElementById('display-division').textContent = USER_DIV + " PORTAL";
+    document.getElementById('user-name-display').textContent = USER_DIV + " Staff";
+    document.getElementById('user-initials').textContent = USER_DIV.substring(0, 2);
+    loadHistory();
+</script>
+</body>
+</html>
