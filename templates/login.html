@@ -1,0 +1,260 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Multimedia Task Management Tracker</title>
+    <!-- Link to your static CSS -->
+   
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+      
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: whitesmoke;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+            align-items: center;
+    }
+
+    /* --- Container --- */
+    .login-box {
+        display: flex;
+        background-color: white;
+        width: 900px;
+        height: 580px;
+        border-radius: 40px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    /* --- Left Side (Purple) --- */
+    .left-panel {
+        flex: 1;
+        background-color: #001f3f;
+        color: white;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .illustration-area {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .circle-bg {
+        width: 280px;
+        height: 280px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        position: absolute;
+    }
+
+    .left-text p {
+        font-size: 13px;
+        text-align: center;
+        line-height: 1.6;
+        opacity: 0.9;
+    }
+
+    /* --- Right Side (White) --- */
+    .right-panel {
+        flex: 1;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .welcome-header {
+        padding: 30px 0 0 30px;
+    }
+
+    .welcome-header span {
+        background-color: #001f3f;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .form-section {
+        padding: 40px 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+    .form-section h2 {
+        color: #444;
+        font-size: 22px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    /* --- Form Fields --- */
+    .input-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .input-group input, 
+    .input-group select {
+        width: 100%;
+        padding: 12px 5px;
+        border: none;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 15px;
+        outline: none;
+        background: transparent;
+        transition: border-color 0.3s;
+        color: #333;
+    }
+
+    /* Dropdown arrow replacement */
+    .input-group select {
+        appearance: none;
+        cursor: pointer;
+    }
+
+    .input-group:has(select)::after {
+        content: '▼';
+        font-size: 10px;
+        color: #001f3f;
+        position: absolute;
+        right: 10px;
+        bottom: 15px;
+        pointer-events: none;
+    }
+
+    .input-group input:focus, 
+    .input-group select:focus {
+        border-color: #001f3f;
+    }
+
+    /* --- Button & Links --- */
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background-color: #001f3f;
+        border: none;
+        border-radius: 30px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(0, 31, 63, 0.4);
+    }
+
+    .login-btn:hover {
+        background-color: #003366;
+    }
+
+    .form-links {
+        margin-top: 25px;
+        text-align: center;
+    }
+
+    .form-links a {
+        display: block;
+        text-decoration: none;
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 10px;
+    }
+
+    .forgot-password {
+        text-decoration: underline !important;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 850px) {
+        .login-box {
+            flex-direction: column;
+            width: 90%;
+            height: auto;
+        }
+        .left-panel {
+            display: none; /* Hide illustration on mobile for space */
+        }
+    }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="login-box">
+            
+            <!-- Left Panel: Illustration (Based on image_0025a1.png) -->
+            <div class="left-panel">
+                <div class="illustration-area">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/b/b7/Cagayan_Valley_Medical_Center_seal.png" alt="CVMC Seal">
+                   
+                </div>
+                <div class="left-text">
+                    <p>Access your professional dashboard and manage your departmental tasks seamlessly within our integrated system.</p>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="right-panel">
+                <div class="welcome-header">
+                    <span>Welcome back, CVMC Peeps!</span>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Login your account</h2>
+                    
+                    <!-- Update 'login_url_name' to your actual URL name in urls.py -->
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                            <p style="color:white; background:#ff4d4d; padding:8px; border-radius:5px; text-align:center;">
+                                Invalid username or password
+                            </p>
+                        {% endif %}
+                        
+                        <!-- Username -->
+                        <div class="input-group">
+                            <input type="text" name="username" placeholder="Username" required autocomplete="username">
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="input-group">
+                            <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+                        </div>
+
+                        
+                        <button type="submit" class="login-btn">Login</button>
+                    </form>
+                    
+                    <div class="form-links">
+                        <a href="{% url 'register' %}" class="create-account">Create Account</a>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
