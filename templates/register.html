@@ -1,0 +1,122 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <style>
+      
+    .register-body {
+        background: whitesmoke; 
+    }
+
+    .register-body .login-box {
+        box-shadow: 0 15px 35px rgba(0, 31, 63, 0.15);
+    }
+
+    .register-body .form-section {
+        padding: 20px 70px;
+    }
+
+    .register-body .form-section h2 {
+        margin-bottom: 20px;
+    }
+
+    .register-body .form-links a {
+        color: #001f3f;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .register-body .form-links a:hover {
+        color: #003366;
+        text-decoration: underline;
+    }
+
+    .register-body .input-group {
+        margin-bottom: 15px; 
+    }
+
+    </style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Multimedia Task Management Tracker</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="register-body"> 
+    <div class="main-container">
+        <div class="login-box">
+            
+            <!-- Left Panel (Stays Navy) -->
+            <div class="left-panel">
+                <div class="illustration-area">
+                    <div class="circle-bg"></div>
+                    <img src="https://upload.wikimedia.org/wikipedia/en/b/b7/Cagayan_Valley_Medical_Center_seal.png" alt="CVMC Seal">
+                </div>
+                <div class="left-text">
+                    <p>Join our professional network. Create an account to access specialized tools tailored for your department.</p>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="right-panel">
+                <div class="welcome-header">
+                    <span>Welcome, CVMC Peeps!</span>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Create Account</h2>
+                    
+                    {% if error %}
+                                <p style="color:white; background:red; padding:8px; text-align:center;">
+                    {{ error }}
+                                </p>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                            <input type="text" name="full_name" placeholder="Full Name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder="Email Address" required>
+                        </div>
+
+                        <div class="input-group">
+                            <select name="role" id="user-role" required>
+                                <option value="" disabled selected>User Role</option>
+                                <option value="admin">ADMIN</option>
+                                <option value="omcc">OMCC</option>
+                                <option value="hopss">HOPSS</option>
+                                <option value="finance">FINANCE</option>
+                                <option value="allied">ALLIED</option>
+                                <option value="nursing">NURSING</option>
+                                <option value="medical">MEDICAL</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <input type="password" name="password" placeholder="Create Password" required>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">Register</button>
+                    </form>
+                    
+                    <div class="form-links">
+                        <a href="{% url 'login' %}">Already have an account? Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
