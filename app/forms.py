@@ -29,7 +29,7 @@ class RegisterForm(forms.ModelForm):
             'role'
         ]
 
-    # HIDE ADMIN OPTION IF ALREADY 2 ADMINS
+    # hides admin role if there are already 2 admin registered in the system
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)

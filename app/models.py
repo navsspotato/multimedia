@@ -16,11 +16,17 @@ class User(AbstractUser):
     ]
 
     full_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
-    role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES
-    )
+    @property
+    def get_initials(self):
+        if self.full_name:
+            names = self.full_name.split()
+            if len(names) >= 2:
+                # Returns first letter of first name and first letter of last name
+                return f"{names[0][0]}{names[-1][0]}".upper()
+            return self.full_name[:2].upper()
+        return self.username[:2].upper()
 
     def __str__(self):
         return self.full_name

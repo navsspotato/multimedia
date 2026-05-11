@@ -32,7 +32,6 @@ def register_view(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
-        # PASSWORD VALIDATION
         if password != confirm_password:
 
             return render(
@@ -43,7 +42,6 @@ def register_view(request):
                 }
             )
 
-        # ADMIN LIMIT VALIDATION
         admin_count = User.objects.filter(
             role='admin'
         ).count()
@@ -58,7 +56,6 @@ def register_view(request):
                 }
             )
 
-        # CREATE USER
         user = User.objects.create_user(
 
             username=email,

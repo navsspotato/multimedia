@@ -106,23 +106,40 @@
         </div>
     </div>
     
-    <div class="sidebar-footer mt-auto dropdown">
-        <button class="user-action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="d-flex align-items-center gap-3">
-                <div id="user-initials-box" style="width: 38px; height: 38px; background: rgba(255,255,255,0.1); border-radius: 10px; display: grid; place-items: center; font-weight: 800; border: 1px dashed rgba(255,255,255,0.3);"></div>
-                <div class="overflow-hidden">
-                    <div id="user-name-label" class="small fw-bold text-truncate" style="max-width: 130px; min-height: 1.2em;"></div>
-                    <div id="user-dept-label" class="opacity-50" style="font-size: 10px; min-height: 1.2em;"></div>
+    <div class="sidebar-footer mt-auto dropdown px-3 pb-3">
+    <button class="user-action-btn d-flex align-items-center justify-content-between w-100 border-0 bg-transparent text-white" type="button" data-bs-toggle="dropdown">
+        <div class="d-flex align-items-center gap-3">
+            <div id="user-initials-box" class="user-avatar-circle">
+                {{ user.get_initials }}
+            </div>
+            
+            <div class="text-start overflow-hidden">
+                <div class="fw-bold text-uppercase" style="font-size: 13px; letter-spacing: 0.5px; color: #fff;">
+                    {{ user.get_role_display|upper }}
+                </div>
+                <div class="opacity-50 text-truncate" style="font-size: 11px; max-width: 120px;">
+                    {{ user.full_name }}
                 </div>
             </div>
-            <i class="bi bi-chevron-up small opacity-50"></i>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark w-100 mb-2">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"></i> View Profile</a></li>
-            <li><hr class="dropdown-divider opacity-10"></li>
-            <li><a class="dropdown-item text-danger" href="#" onclick="alert('Signing out...')"><i class="bi bi-power"></i> Sign Out</a></li>
-        </ul>
-    </div>
+        </div>
+        <i class="bi bi-chevron-up small opacity-50"></i>
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-dark w-100 p-3 mb-2 border-0 shadow-lg" style="background-color: #1a2234; border-radius: 12px;">
+        <li>
+            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                {% csrf_token %}
+            </form>
+    
+            <a class="dropdown-item text-danger d-flex align-items-center gap-2 py-2" 
+                href="#" 
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-box-arrow-right fs-5"></i> 
+                    <span class="fw-bold">Log Out</span>
+            </a>
+        </li>
+    </ul>
+</div>
 </aside>
 
 <div id="main-wrapper">
@@ -177,7 +194,7 @@
                             <select id="division" class="form-select">
                                 <option value="" disabled selected>Select Division</option>
                                 <option>Medical</option><option>Nursing Service</option><option>Allied Health</option>
-                                <option>Hospital Operations</option><option>OMCC</option><option>Finance</option><option>HOPSS</option>
+                                <option>OMCC</option><option>Finance</option><option>HOPSS</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -198,7 +215,7 @@
                         <div class="col-md-4">
                             <label class="form-label">Attachment/Delivery</label>
                             <select id="delivery" class="form-select">
-                                <option>For Pick-Up</option><option>Shared Drive</option><option>Email Delivery</option>
+                                <option>Shared Drive</option><option>Email Delivery</option>
                             </select>
                         </div>
                     </div>
