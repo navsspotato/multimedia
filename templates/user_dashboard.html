@@ -89,248 +89,501 @@
 </head>
 <body>
 
-<aside id="sidebar">
-    <div class="brand-section text-center">
-        <div class="brand-name">MULTIMEDIA<br>REQUEST</div>
-        <div class="small opacity-50 fw-bold mt-1" style="font-size: 10px; letter-spacing: 2px;">Request System</div>
-    </div>
-    <div class="mt-4">
-        <div class="nav-link active" id="nav-dashboard" onclick="switchView('dashboard', this)">
-            <i class="bi bi-grid-fill me-3"></i> Dashboard
+<body>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+
+        <div class="brand-section text-center">
+            <div class="brand-name">
+                MULTIMEDIA<br>REQUEST
+            </div>
+
+            <div class="small opacity-50 fw-bold mt-1"
+                 style="font-size: 10px; letter-spacing: 2px;">
+                Request System
+            </div>
         </div>
-        <div class="nav-link" id="nav-request" onclick="switchView('new-request', this)">
-            <i class="bi bi-plus-circle-fill me-3"></i> New Request
+
+        <!-- NAVIGATION -->
+        <div class="mt-4">
+
+            <div class="nav-link active"
+                 id="nav-dashboard"
+                 onclick="switchView('dashboard', this)">
+                <i class="bi bi-grid-fill me-3"></i>
+                Dashboard
+            </div>
+
+            <div class="nav-link"
+                 id="nav-request"
+                 onclick="switchView('new-request', this)">
+                <i class="bi bi-plus-circle-fill me-3"></i>
+                New Request
+            </div>
+
+            <div class="nav-link"
+                 id="nav-my-requests"
+                 onclick="switchView('my-requests', this)">
+                <i class="bi bi-folder2-open me-3"></i>
+                My Requests
+            </div>
+
         </div>
-        <div class="nav-link" id="nav-my-requests" onclick="switchView('my-requests', this)">
-            <i class="bi bi-folder2-open me-3"></i> My Requests
-        </div>
-    </div>
-    
-    <div class="sidebar-footer mt-auto dropdown px-3 pb-3">
-    <button class="user-action-btn d-flex align-items-center justify-content-between w-100 border-0 bg-transparent text-white" type="button" data-bs-toggle="dropdown">
+
+<div class="sidebar-footer mt-auto dropdown px-3 pb-3">
+    <button class="user-action-btn d-flex align-items-center justify-content-between w-100 border-0 bg-transparent text-white p-2"
+            type="button"
+            data-bs-toggle="dropdown"
+            style="border-radius: 12px; background: rgba(30, 41, 59, 0.5) !important;">
+
         <div class="d-flex align-items-center gap-3">
-            <div id="user-initials-box" class="user-avatar-circle">
-                {{ user.get_initials }}
+            <div id="user-initials-box" class="user-avatar-circle" 
+                 style="width:40px; height:40px; background:#1e3a8a; color:#93c5fd; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; flex-shrink:0;">
+                {% if user.first_name and user.last_name %}
+                    {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                {% else %}
+                    {{ user.username|slice:":2"|upper }}
+                {% endif %}
             </div>
-            
-            <div class="text-start overflow-hidden">
-                <div class="fw-bold text-uppercase" style="font-size: 13px; letter-spacing: 0.5px; color: #fff;">
-                    {{ user.get_role_display|upper }}
+
+            <div class="text-start overflow-hidden" style="line-height: 1.4;">
+                <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Signed in as
                 </div>
-                <div class="opacity-50 text-truncate" style="font-size: 11px; max-width: 120px;">
-                    {{ user.full_name }}
+                <div class="fw-bold text-uppercase"
+                     style="font-size: 13px; letter-spacing: 0.5px; color: #fff;">
+                    {% if user.groups.all %}{{ user.groups.all.0.name }}{% else %}{{ user.get_role_display|upper }}{% endif %}
+                </div>
+                <div class="opacity-50 text-truncate"
+                     style="font-size: 11px; max-width: 120px;">
+                    {{ user.get_full_name|default:user.username }}
                 </div>
             </div>
         </div>
+
         <i class="bi bi-chevron-up small opacity-50"></i>
     </button>
 
-    <ul class="dropdown-menu dropdown-menu-dark w-100 p-3 mb-2 border-0 shadow-lg" style="background-color: #1a2234; border-radius: 12px;">
+    <ul class="dropdown-menu dropdown-menu-dark w-100 p-2 mb-2 border-0 shadow-lg"
+        style="background-color: #1e293b; border-radius: 12px;">
+
         <li>
-            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+            <form id="logout-form"
+                  action="{% url 'logout' %}"
+                  method="post"
+                  style="display: none;">
                 {% csrf_token %}
             </form>
-    
-            <a class="dropdown-item text-danger d-flex align-items-center gap-2 py-2" 
-                href="#" 
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right fs-5"></i> 
-                    <span class="fw-bold">Log Out</span>
+
+            <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+               href="#"
+               style="color: #f87171; border-radius: 8px;"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="bi bi-box-arrow-right fs-5"></i>
+                <span class="fw-bold">Log Out</span>
             </a>
         </li>
     </ul>
 </div>
-</aside>
 
-<div id="main-wrapper">
-    <header class="top-header">
-        <h4 class="fw-bold mb-0" id="current-view-title">DASHBOARD</h4>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-wrapper">
+
+        <!-- HEADER -->
+        <header class="top-header">
+            <h4 class="fw-bold mb-0" id="current-view-title">
+                DASHBOARD
+            </h4>
         </header>
 
-    <section id="view-dashboard" class="view-section active">
-        <div class="row g-3 mb-5">
-            <div class="col-md-3"><div class="stat-card blue"><div class="text-muted small fw-bold mb-1">TOTAL REQUESTS</div><div class="stat-val" id="stat-total">0</div></div></div>
-            <div class="col-md-3"><div class="stat-card amber"><div class="text-muted small fw-bold mb-1">ONGOING/PENDING</div><div class="stat-val" id="stat-pending">0</div></div></div>
-            <div class="col-md-3"><div class="stat-card green"><div class="text-muted small fw-bold mb-1">COMPLETED</div><div class="stat-val" id="stat-done">0</div></div></div>
-            <div class="col-md-3"><div class="stat-card red"><div class="text-muted small fw-bold mb-1">NOT STARTED</div><div class="stat-val" id="stat-not-started">0</div></div></div>
-        </div>
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr class="small fw-bold text-muted">
-                            <th class="ps-4">PROJECT</th><th>DIVISION / UNIT</th><th>CATEGORY</th><th>TARGET</th><th>STATUS</th><th>IT STAFF</th>
-                        </tr>
-                    </thead>
-                    <tbody id="dashboard-table-body"></tbody>
-                </table>
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="view-section active">
+
+            <div class="row g-3 mb-5">
+
+                <div class="col-md-3">
+                    <div class="stat-card blue">
+                        <div class="text-muted small fw-bold mb-1">
+                            TOTAL REQUESTS
+                        </div>
+
+                        <div class="stat-val">
+                            {{ requests|length }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card amber">
+                        <div class="text-muted small fw-bold mb-1">
+                            ONGOING/PENDING
+                        </div>
+
+                        <div class="stat-val">
+                            0
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card green">
+                        <div class="text-muted small fw-bold mb-1">
+                            COMPLETED
+                        </div>
+
+                        <div class="stat-val">
+                            0
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card red">
+                        <div class="text-muted small fw-bold mb-1">
+                            NOT STARTED
+                        </div>
+
+                        <div class="stat-val">
+                            0
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </div>
-    </section>
 
-    <section id="view-new-request" class="view-section">
-        <div class="container-fluid" style="max-width: 950px;">
-            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
-                <h3 class="fw-bold mb-1">Create New Request</h3>
-                <p class="text-muted mb-4">Select a category and fill in the project requirements.</p>
-                <form id="requestForm">
-                    <label class="form-label text-primary">1. Select Category</label>
-                    <div class="cat-grid mb-4">
-                        <div class="cat-option" onclick="selectCategory(this, 'Graphic Design')"><i class="bi bi-palette2 d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Graphic Design</div></div>
-                        <div class="cat-option" onclick="selectCategory(this, 'Audio-Visual Presentation')"><i class="bi bi-play-btn d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Audio-Visual Presentation Design</div></div>
-                        <div class="cat-option" onclick="selectCategory(this, 'Photography and Editing')"><i class="bi bi-camera d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Photography and Editing </div></div>
-                        <div class="cat-option" onclick="selectCategory(this, 'Branding and Identity')"><i class="bi bi-award d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Branding and Identity</div></div>
-                        <div class="cat-option" onclick="selectCategory(this, 'Publication Design')"><i class="bi bi-book d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Publication Design</div></div>
-                        <div class="cat-option" onclick="selectCategory(this, 'Web and Digital Design')"><i class="bi bi-globe2 d-block fs-4 mb-1 text-primary"></i><div class="fw-bold small">Web & Digital Design</div></div>
-                    </div>
+            <!-- TABLE -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Date of Request</label>
-                            <input type="date" id="reqDate" class="form-control" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Division</label>
-                            <select id="division" class="form-select">
-                                <option value="" disabled selected>Select Division</option>
-                                <option>Medical</option><option>Nursing Service</option><option>Allied Health</option>
-                                <option>OMCC</option><option>Finance</option><option>HOPSS</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Unit/Office/Dept</label>
-                            <input type="text" id="unitDept" class="form-control" placeholder="e.g. ICU, Record Section">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Target Date</label>
-                            <input type="date" id="targetDate" class="form-control">
-                        </div>
-                    </div>
+                <div class="table-responsive">
 
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-8">
-                            <label class="form-label">Project Title</label>
-                            <input type="text" id="projTitle" class="form-control">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Attachment/Delivery</label>
-                            <select id="delivery" class="form-select">
-                                <option>Shared Drive</option><option>Email Delivery</option>
-                            </select>
-                        </div>
-                    </div>
+                    <table class="table align-middle mb-0">
 
-                    <div class="mb-3"><label class="form-label">Description</label><textarea id="projDesc" class="form-control" rows="3"></textarea></div>
-                    <div class="mb-4"><label class="form-label">Remarks</label><input type="text" id="remarks" class="form-control"></div>
+                        <thead class="bg-light">
 
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button type="button" class="btn btn-light px-4 fw-bold" onclick="switchView('dashboard', document.getElementById('nav-dashboard'))">Cancel</button>
-                        <button type="button" class="btn btn-primary px-5 fw-bold shadow-sm" onclick="submitForm()">Submit Request</button>
-                    </div>
-                </form>
+                            <tr class="small fw-bold text-muted">
+                                <th class="ps-4">PROJECT</th>
+                                <th>DIVISION</th>
+                                <th>CATEGORY</th>
+                                <th>TARGET</th>
+                                <th>STATUS</th>
+                                <th>IT STAFF</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for req in requests %}
+
+                            <tr>
+
+                                <td class="ps-4 fw-bold">
+                                    {{ req.project_title }}
+                                </td>
+
+                                <td>
+                                    {{ req.division }}
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark border small">
+                                        {{ req.category }}
+                                    </span>
+                                </td>
+
+                                <td class="text-muted small">
+                                    {{ req.target_date }}
+                                </td>
+
+                                <td>
+                                    <span class="badge-custom bg-{{ req.status|lower }}">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+
+                                <td class="small fw-bold">
+                                    {{ req.assigned_to|default:"—" }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="6"
+                                    class="text-center py-5 text-muted">
+                                    No requests found.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
             </div>
-        </div>
-    </section>
 
-    <section id="view-my-requests" class="view-section">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white py-3 border-0"><h5 class="fw-bold mb-0">My Personal History</h5></div>
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead>
-                        <tr class="small fw-bold text-muted bg-light">
-                            <th class="ps-4">PROJECT</th><th>CATEGORY</th><th style="min-width:320px;">STATUS PROGRESS</th><th>STATUS</th><th>IT STAFF</th>
-                        </tr>
-                    </thead>
-                    <tbody id="my-requests-table"></tbody>
-                </table>
+        </section>
+
+        <!-- NEW REQUEST -->
+        <section id="view-new-request" class="view-section">
+
+            <div class="container-fluid" style="max-width: 950px;">
+
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+
+                    <h3 class="fw-bold mb-1">
+                        Create New Request
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        Select a category and fill in the project requirements.
+                    </p>
+
+                    <form method="POST"
+                          action="{% url 'create_request' %}">
+
+                        {% csrf_token %}
+
+                        <div class="row g-3 mb-3">
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Division
+                                </label>
+
+                                <select name="division"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">Select Division</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Nursing Service">Nursing Service</option>
+                                    <option value="Allied Health">Allied Health</option>
+                                    <option value="OMCC">OMCC</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="HOPSS">HOPSS</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Category
+                                </label>
+
+                                <select name="category"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">Select Category</option>
+                                    <option value="Graphic Design">Graphic Design</option>
+                                    <option value="Video Editing">Video Editing</option>
+                                    <option value="PowerPoint">PowerPoint</option>
+                                    <option value="Photography">Photography</option>
+                                    <option value="Publication">Publication</option>
+                                    <option value="Web Design">Web Design</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Request Type
+                                </label>
+
+                                <select name="request_type"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="">Select Type</option>
+                                    <option value="PPT Presentation">PPT Presentation</option>
+                                    <option value="Tarp Design">Tarp Design</option>
+                                    <option value="Video Editing">Video Editing</option>
+                                    <option value="Certificate">Certificate</option>
+                                    <option value="Social Media Pubmat">Social Media Pubmat</option>
+                                    <option value="Newsletter">Newsletter</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Project Title
+                                </label>
+
+                                <input type="text"
+                                       name="project_title"
+                                       class="form-control"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Target Date
+                                </label>
+
+                                <input type="date"
+                                       name="target_date"
+                                       class="form-control"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-12">
+
+                                <label class="form-label">
+                                    Description
+                                </label>
+
+                                <textarea name="description"
+                                          class="form-control"
+                                          rows="4"
+                                          required></textarea>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <button type="button"
+                                    class="btn btn-light px-4 fw-bold"
+                                    onclick="switchView('dashboard', document.getElementById('nav-dashboard'))">
+                                Cancel
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-primary px-5 fw-bold shadow-sm">
+                                Submit Request
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
             </div>
-        </div>
-    </section>
-</div>
+
+        </section>
+
+        <!-- MY REQUESTS -->
+        <section id="view-my-requests" class="view-section">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold mb-0">
+                        My Personal History
+                    </h5>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead>
+
+                            <tr class="small fw-bold text-muted bg-light">
+                                <th class="ps-4">PROJECT</th>
+                                <th>CATEGORY</th>
+                                <th>STATUS</th>
+                                <th>IT STAFF</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for req in requests %}
+
+                            <tr>
+
+                                <td class="ps-4 fw-bold">
+                                    {{ req.project_title }}
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-light text-dark border small">
+                                        {{ req.category }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge-custom bg-{{ req.status|lower }}">
+                                        {{ req.status }}
+                                    </span>
+                                </td>
+
+                                <td class="small fw-bold">
+                                    {{ req.assigned_to|default:"—" }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="4"
+                                    class="text-center py-5 text-muted">
+                                    No personal history found.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</body>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    let selectedCat = "";
-    let database = []; 
-    const workflowSteps = ['Requested', 'Approved', 'Scheduled', 'Ongoing', 'Done'];
-
-    function renderTables() {
-        const dBody = document.getElementById('dashboard-table-body');
-        const mBody = document.getElementById('my-requests-table');
-        
-        if (database.length === 0) {
-            dBody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">No requests found.</td></tr>`;
-            mBody.innerHTML = `<tr><td colspan="5" class="text-center py-5 text-muted">No personal history found.</td></tr>`;
-        } else {
-            dBody.innerHTML = database.map(item => `
-                <tr>
-                    <td class="ps-4 fw-bold text-navy">${item.title}</td>
-                    <td><strong>${item.div}</strong><br><small class="text-muted">${item.unit}</small></td>
-                    <td><span class="badge bg-light text-dark border small">${item.cat}</span></td>
-                    <td class="text-muted small">${item.target}</td>
-                    <td><span class="badge-custom bg-${item.status.toLowerCase()}">${item.status}</span></td>
-                    <td class="small fw-bold">${item.staff}</td>
-                </tr>
-            `).reverse().join('');
-
-            mBody.innerHTML = database.map(item => {
-                const track = workflowSteps.map((s, index) => {
-                    const stepIdx = index + 1;
-                    return `<div class="prog-step-container">
-                                <div class="prog-step ${s.toLowerCase()} ${stepIdx < item.step ? 'completed-step' : ''} ${stepIdx === item.step ? 'active' : ''}"></div>
-                                <div class="prog-label ${stepIdx === item.step ? 'active' : ''}">${s}</div>
-                            </div>`;
-                }).join('');
-                return `<tr>
-                    <td class="ps-4 fw-bold">${item.title}</td>
-                    <td><span class="badge bg-light text-dark border small">${item.cat}</span></td>
-                    <td><div class="progress-track"><div class="progress-line"></div>${track}</div></td>
-                    <td><span class="badge-custom bg-${item.status.toLowerCase()}">${item.status}</span></td>
-                    <td class="small fw-bold">${item.staff}</td>
-                </tr>`;
-            }).reverse().join('');
-        }
-        
-        document.getElementById('stat-total').innerText = database.length;
-        document.getElementById('stat-pending').innerText = database.filter(i => ['Ongoing', 'Approved', 'Scheduled'].includes(i.status)).length;
-        document.getElementById('stat-done').innerText = database.filter(i => i.status === 'Done').length;
-        document.getElementById('stat-not-started').innerText = database.filter(i => i.status === 'Requested').length;
-    }
-
     function switchView(viewId, el) {
-        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+
+        document.querySelectorAll('.view-section').forEach(v => {
+            v.classList.remove('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(n => {
+            n.classList.remove('active');
+        });
+
         document.getElementById('view-' + viewId).classList.add('active');
-        if(el) el.classList.add('active');
-        document.getElementById('current-view-title').innerText = viewId.replace("-", " ").toUpperCase();
-        if(viewId === 'new-request') document.getElementById('reqDate').valueAsDate = new Date();
-    }
 
-    function selectCategory(el, catName) {
-        document.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedCat = catName;
-    }
+        if (el) {
+            el.classList.add('active');
+        }
 
-    function submitForm() {
-        const title = document.getElementById('projTitle').value;
-        const div = document.getElementById('division').value;
-        const unit = document.getElementById('unitDept').value || '—';
-        const date = document.getElementById('targetDate').value;
-        
-        if(!selectedCat || !title || !div || !date) { alert("Please complete the required fields."); return; }
-        
-        database.push({title: title, div: div, unit: unit, cat: selectedCat, target: date, status: 'Requested', step: 1, staff: '—'});
-        alert("Request successfully submitted!");
-        document.getElementById('requestForm').reset();
-        document.querySelectorAll('.cat-option').forEach(o => o.classList.remove('selected'));
-        selectedCat = "";
-        renderTables();
-        switchView('my-requests', document.getElementById('nav-my-requests'));
+        document.getElementById('current-view-title').innerText =
+            viewId.replace("-", " ").toUpperCase();
     }
-
-    window.onload = renderTables;
 </script>
 </body>
 </html>
