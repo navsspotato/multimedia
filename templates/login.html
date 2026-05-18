@@ -5,8 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Multimedia Task Management Tracker</title>
-    <!-- Link to your static CSS -->
+    <title>Login | CVMC Tracker</title>
    
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,7 +27,7 @@
             align-items: center;
     }
 
-    /* --- Container --- */
+  
     .login-box {
         display: flex;
         background-color: white;
@@ -39,7 +38,7 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
-    /* --- Left Side (Purple) --- */
+   
     .left-panel {
         flex: 1;
         background-color: #001f3f;
@@ -75,7 +74,7 @@
         opacity: 0.9;
     }
 
-    /* --- Right Side (White) --- */
+   
     .right-panel {
         flex: 1;
         background-color: white;
@@ -110,7 +109,7 @@
         text-align: center;
     }
 
-    /* --- Form Fields --- */
+  
     .input-group {
         margin-bottom: 25px;
         position: relative;
@@ -129,7 +128,7 @@
         color: #333;
     }
 
-    /* Dropdown arrow replacement */
+
     .input-group select {
         appearance: none;
         cursor: pointer;
@@ -150,7 +149,7 @@
         border-color: #001f3f;
     }
 
-    /* --- Button & Links --- */
+   
     .login-btn {
         width: 100%;
         padding: 14px;
@@ -186,7 +185,7 @@
         text-decoration: underline !important;
     }
 
-    /* Mobile Responsiveness */
+   
     @media (max-width: 850px) {
         .login-box {
             flex-direction: column;
@@ -194,7 +193,7 @@
             height: auto;
         }
         .left-panel {
-            display: none; /* Hide illustration on mobile for space */
+            display: none; 
         }
     }
     </style>
@@ -232,12 +231,12 @@
                             </p>
                         {% endif %}
                         
-                        <!-- Username -->
+                      
                         <div class="input-group">
                             <input type="text" name="username" placeholder="Username" required autocomplete="username">
                         </div>
                         
-                        <!-- Password -->
+                     
                         <div class="input-group">
                             <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
                         </div>

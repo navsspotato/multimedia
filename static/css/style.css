@@ -6,8 +6,6 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* --- Body Backgrounds --- */
-/* For Login (Dark Navy) */
 body {
     background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
     height: 100vh;
@@ -16,7 +14,6 @@ body {
     align-items: center;
 }
 
-/* For Register (Light Gray) */
 body.register-body {
     background: #f0f2f5; 
 }
@@ -28,16 +25,15 @@ body.register-body {
     width: 900px;
     min-height: 600px;
     height: auto;
-    border-radius: 40px;
-    overflow: visible;
+    /* FIX: Force rounded corners to 40px to match Login page */
+    border-radius: 40px !important; 
+    /* FIX: Force the clip so navy panel doesn't have sharp edges */
+    overflow: hidden !important; 
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    position: relative;
 }
 
-.register-body .login-box {
-    box-shadow: 0 15px 35px rgba(0, 31, 63, 0.15);
-}
-
-/* --- Left Side (Navy Panel) --- */
+/* --- Panels --- */
 .left-panel {
     flex: 1;
     background-color: #001f3f; 
@@ -45,36 +41,10 @@ body.register-body {
     padding: 60px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-}
-
-.illustration-area {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.circle-bg {
-    width: 280px;
-    height: 280px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    position: absolute;
-}
-
-.left-text p {
-    font-size: 13px;
-    text-align: center;
-    line-height: 1.6;
-    opacity: 0.8;
-}
-
-/* --- Right Side (White Form Panel) --- */
 .right-panel {
     flex: 1;
     background-color: white;
@@ -82,39 +52,15 @@ body.register-body {
     flex-direction: column;
 }
 
-.welcome-header {
-    padding: 30px 0 0 30px;
-}
-
-.welcome-header span {
-    background-color: #001f3f;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-}
-
+/* --- Form Styling --- */
 .form-section {
     padding: 40px 70px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-grow: 1;
 }
 
-/* Specific adjustment for Register page to fit more fields */
 .register-body .form-section {
-    padding: 20px 70px;
+    padding: 20px 70px 40px 70px;
 }
 
-.form-section h2 {
-    color: #001f3f;
-    font-size: 22px;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-/* --- Form Elements --- */
 .input-group {
     margin-bottom: 25px;
     position: relative;
@@ -125,20 +71,19 @@ body.register-body {
     width: 100%;
     padding: 12px 5px;
     border: none;
-    border-bottom: 2px solid #d1d1d1;
+    border-bottom: 2px solid #d1d1d1 !important;
     font-size: 15px;
     outline: none;
     background: transparent;
-    transition: border-color 0.3s;
     color: #333;
+    border-radius: 0;
+    /* FIX: Remove the box look from dropdown */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
 }
 
 /* Custom Dropdown Arrow */
-.input-group select {
-    appearance: none;
-    cursor: pointer;
-}
-
 .input-group:has(select)::after {
     content: '▼';
     font-size: 10px;
@@ -149,12 +94,6 @@ body.register-body {
     pointer-events: none;
 }
 
-.input-group input:focus, 
-.input-group select:focus {
-    border-color: #001f3f;
-}
-
-/* --- Button & Links --- */
 .login-btn {
     width: 100%;
     padding: 14px;
@@ -165,44 +104,11 @@ body.register-body {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 15px;
-    transition: background 0.3s;
+    box-shadow: 0 10px 20px rgba(0, 31, 63, 0.2);
+    transition: all 0.3s;
 }
 
 .login-btn:hover {
-    background-color: #003366;
-}
-
-.form-links {
-    margin-top: 25px;
-    text-align: center;
-}
-
-.form-links a {
-    display: block;
-    text-decoration: none;
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.register-body .form-links a {
-    color: #001f3f;
-    font-weight: 500;
-}
-
-.forgot-password {
-    text-decoration: underline !important;
-}
-
-/* --- Mobile Fixes --- */
-@media (max-width: 850px) {
-    .login-box {
-        flex-direction: column;
-        width: 90%;
-        height: auto;
-    }
-    .left-panel {
-        display: none;
-    }
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 31, 63, 0.3);
 }
