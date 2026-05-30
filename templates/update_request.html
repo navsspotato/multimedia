@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Task | Multimedia Task Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root { 
+            --navy: #0f1f3d; 
+            --primary: #2563eb; 
+            --bg: #f0f4fa; 
+            --border: #e2e8f0; 
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg); 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 32px 16px; 
+        }
+
+        .edit-card { 
+            background: #fff; 
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            overflow: hidden; 
+            width: 100%; 
+            max-width: 780px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08); 
+        }
+
+        .edit-header { 
+            background: var(--navy); 
+            padding: 24px 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+
+        .edit-header h2 { 
+            font-family: 'Syne', sans-serif; 
+            color: #fff; 
+            font-size: 18px; 
+            margin: 0; 
+        }
+
+        .edit-header a { 
+            color: rgba(255,255,255,0.5); 
+            text-decoration: none; 
+            font-size: 13px; 
+            font-weight: 600; 
+            transition: 0.2s; 
+        }
+
+        .edit-header a:hover { 
+            color: #fff; 
+        }
+
+        .edit-body { 
+            padding: 32px; 
+        }
+
+        .form-label { 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: var(--navy); 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 6px; 
+            display: block; 
+        }
+
+        .form-control, .form-select { 
+            border-radius: 10px; 
+            border: 1px solid var(--border); 
+            font-size: 13px; 
+            padding: 9px 12px; 
+            font-weight: 600; 
+            color: var(--navy); 
+            background: var(--bg); 
+        }
+
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12); 
+            background: #fff; 
+            outline: none; 
+        }
+
+        .section-label { 
+            font-size: 10px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #94a3b8; 
+            margin: 20px 0 12px; 
+            padding-bottom: 8px; 
+            border-bottom: 1px solid var(--border); 
+        }
+
+        .btn-save { 
+            background: var(--primary); 
+            color: #fff; 
+            border: none; 
+            border-radius: 12px; 
+            padding: 10px 28px; 
+            font-weight: 700; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+
+        .btn-save:hover { 
+            background: #1d4ed8; 
+            box-shadow: 0 4px 16px rgba(37,99,235,0.3); 
+        }
+
+        .btn-cancel { 
+            background: var(--bg); 
+            color: #64748b; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            padding: 10px 20px; 
+            font-weight: 700; 
+            font-size: 13px; 
+            text-decoration: none; 
+            transition: 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+        }
+
+        .btn-cancel:hover { 
+            background: #e2e8f0; 
+            color: var(--navy); 
+        }
+        
+    </style>
+</head>
+<body>
+<div class="edit-card">
+
+    <div class="edit-header">
+        <h2><i class="bi bi-pencil-square me-2"></i>Edit Task — {{ task.project_title }}</h2>
+        <a href="{% url 'dashboard' %}"><i class="bi bi-arrow-left me-1"></i> Back to Dashboard</a>
+    </div>
+
+    <div class="edit-body">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="section-label">Project Info</div>
+            <div class="row g-3">
+
+                <div class="col-md-8">
+                    <label class="form-label">Project Title</label>
+                    <input type="text" name="project_title" class="form-control"
+                           value="{{ task.project_title }}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Division</label>
+                    <select name="division" class="form-select">
+                        <option {% if task.division == "MEDICAL SERVICE" %}selected{% endif %}>MEDICAL SERVICE</option>
+                        <option {% if task.division == "NURSING SERVICE" %}selected{% endif %}>NURSING SERVICE</option>
+                        <option {% if task.division == "ALLIED HEALTH" %}selected{% endif %}>ALLIED HEALTH</option>
+                        <option {% if task.division == "OMCC" %}selected{% endif %}>OMCC</option>
+                        <option {% if task.division == "FINANCE" %}selected{% endif %}>FINANCE</option>
+                        <option {% if task.division == "HOPSS" %}selected{% endif %}>HOPSS</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Request Type</label>
+                    <select name="request_type" class="form-select">
+                        <option {% if task.request_type == "Tarpaulin" %}selected{% endif %}>Tarpaulin</option>
+                        <option {% if task.request_type == "Invitation" %}selected{% endif %}>Invitation</option>
+                        <option {% if task.request_type == "Newsletter" %}selected{% endif %}>Newsletter</option>
+                        <option {% if task.request_type == "AVP" %}selected{% endif %}>AVP</option>
+                        <option {% if task.request_type == "Calling Card" %}selected{% endif %}>Calling Card</option>
+                        <option {% if task.request_type == "ID" %}selected{% endif %}>ID</option>
+                        <option {% if task.request_type == "T-Shirt design" %}selected{% endif %}>T-Shirt design</option>
+                        <option {% if task.request_type == "Photo Documentation" %}selected{% endif %}>Photo Documentation</option>
+                        <option {% if task.request_type == "Sticker Design" %}selected{% endif %}>Sticker Design</option>
+                        <option {% if task.request_type == "Certificate" %}selected{% endif %}>Certificate</option>
+                        <option {% if task.request_type == "Calendar" %}selected{% endif %}>Calendar</option>
+                        <option {% if task.request_type == "Photo Editing" %}selected{% endif %}>Photo Editing</option>
+                        <option {% if task.request_type == "Market Survey" %}selected{% endif %}>Market Survey</option>
+                        <option {% if task.request_type == "Poster" %}selected{% endif %}>Poster</option>
+                        <option {% if task.request_type == "Social Media Pubmat" %}selected{% endif %}>Social Media Pubmat</option>
+                        <option {% if task.request_type == "PPT Presentation" %}selected{% endif %}>PPT Presentation</option>
+                        <option {% if task.request_type == "Video Editing" %}selected{% endif %}>Video Editing</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option {% if task.category == "Graphic Design" %}selected{% endif %}>Graphic Design</option>
+                        <option {% if task.category == "Audio-Visual Presentation" %}selected{% endif %}>Audio-Visual Presentation</option>
+                        <option {% if task.category == "Web and Digital Design" %}selected{% endif %}>Web and Digital Design</option>
+                        <option {% if task.category == "Photography and Editing" %}selected{% endif %}>Photography and Editing</option>
+                        <option {% if task.category == "Publication Design" %}selected{% endif %}>Publication Design</option>
+                        <option {% if task.category == "Branding and Identity" %}selected{% endif %}>Branding and Identity</option>
+                    </select>
+                </div>
+
+
+            </div>
+
+            <div class="section-label">Status & Assignment</div>
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        {% for s in status_choices %}
+                        <option value="{{ s }}" {% if task.status == s %}selected{% endif %}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-8">
+                    <label class="form-label">Staff Assigned</label>
+                    <select name="assigned_to" class="form-select">
+                        <option value="">— Unassigned —</option>
+                        {% for staff in staff_list %}
+                        <option value="{{ staff.pk }}"
+                            {% if task.assigned_to and task.assigned_to.pk == staff.pk %}selected{% endif %}>
+                            {{ staff.get_full_name|default:staff.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="section-label">Dates</div>
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Date Started</label>
+                    <input type="date" name="date_started" class="form-control"
+                           value="{{ task.date_started|date:'Y-m-d'|default:'' }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Date Completed</label>
+                    <input type="date" name="date_completed" class="form-control"
+                           value="{{ task.date_completed|date:'Y-m-d'|default:'' }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" name="due_date" class="form-control"
+                           value="{{ task.due_date|date:'Y-m-d'|default:'' }}">
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3" style="border-top: 1px solid var(--border);">
+                <a href="{% url 'dashboard' %}" class="btn-cancel">
+                    <i class="bi bi-x-lg me-1"></i> Cancel
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-lg me-1"></i> Save Changes
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+</body>
+</html>

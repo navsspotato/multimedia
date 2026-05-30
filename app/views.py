@@ -331,6 +331,11 @@ def register_view(request):
 
         if User.objects.filter(username=email).exists():
             return render(request, 'register.html', {'error': 'An account with this email already exists.'})
+        
+        if role.lower() == 'admin':
+            admin_count = User.objects.filter(role='admin').count()
+            if admin_count >= 2:
+                return render(request, 'register.html', {'error': 'Maximum number of administrators has been reached.'})
 
         User.objects.create_user(
             username=email,
@@ -343,6 +348,8 @@ def register_view(request):
         return redirect('pending_approval')
     return render(request, 'register.html')
 
+def forgot_password_view(request):
+    return render(request, 'forgot_password.html')
 
 def pending_approval_view(request):
     return render(request, 'pending_approval.html')
