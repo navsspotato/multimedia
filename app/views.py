@@ -1,4 +1,3 @@
-from django import tasks
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.decorators import login_required
