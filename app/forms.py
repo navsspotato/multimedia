@@ -29,7 +29,7 @@ class RegisterForm(forms.ModelForm):
             'role'
         ]
 
-    # hides admin role if there are already 2 admin registered in the system
+
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
@@ -38,7 +38,7 @@ class RegisterForm(forms.ModelForm):
             role='admin'
         ).count()
 
-        # REMOVE ADMIN FROM DROPDOWN
+
         if admin_count >= 2:
 
             self.fields['role'].choices = [
@@ -46,7 +46,7 @@ class RegisterForm(forms.ModelForm):
                 if choice[0] != 'admin'
             ]
 
-    # CHECK PASSWORDS MATCH
+ 
     def clean(self):
 
         cleaned_data = super().clean()
@@ -62,7 +62,7 @@ class RegisterForm(forms.ModelForm):
 
         return cleaned_data
 
-    # BACKEND SECURITY
+
     def clean_role(self):
 
         role = self.cleaned_data.get('role')

@@ -216,7 +216,7 @@
             <!-- Login Form -->
             <div class="right-panel">
                 <div class="welcome-header">
-                    <span>Welcome back, CVMC Peeps!</span>
+                    <span>Welcome back, KaCVMC!</span>
                 </div>
                 
                 <div class="form-section">
@@ -225,9 +225,9 @@
                     <form method="POST">
                         {% csrf_token %}
 
-                        {% if form.errors %}
+                        {% if error %}
                             <p style="color:white; background:#ff4d4d; padding:8px; border-radius:5px; text-align:center;">
-                                Invalid username or password
+                                {{ error }}
                             </p>
                         {% endif %}
                         

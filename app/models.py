@@ -14,6 +14,8 @@ class User(AbstractUser):
         ('staff', 'MEDIA STAFF'), 
     ]
 
+    is_approved = models.BooleanField(default=False)
+
     full_name = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES) 
 
@@ -52,11 +54,31 @@ class Request(models.Model):
     description = models.TextField()
     target_date = models.DateField()
 
+    DELIVERY_CHOICES = [
+    ('email', 'Email'),
+    ('shared_drive', 'Shared Drive'),
+    ]
+
+    delivery_type = models.CharField(
+        max_length=20,
+        choices=DELIVERY_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    delivery_detail = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Email address or shared drive link"
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='Requested'
     )
+
 
     def save(self, *args, **kwargs):
         if self.user and not self.division:
@@ -80,3 +102,15 @@ class Request(models.Model):
 
     def __str__(self):
         return self.project_title
+    
+class RequestAttachment(models.Model):
+        request = models.ForeignKey(
+            Request,
+            on_delete=models.CASCADE,
+            related_name='attachments'
+        )
+        file = models.FileField(upload_to='request_attachments/')
+        uploaded_at = models.DateTimeField(auto_now_add=True)
+
+        def __str__(self):
+            return f"Attachment for {self.request.project_title}"

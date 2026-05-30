@@ -2,11 +2,14 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 from django.contrib import admin
 from app import views  
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.register_view, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('pending-approval/', views.pending_approval_view, name='pending_approval'),
 
     path('dashboard/', views.dashboard_view, name='dashboard'),
 
@@ -16,5 +19,8 @@ urlpatterns = [
 
     path('task/update-status/<int:pk>/', views.update_task_status, name='update_task_status'),
 
+    path('user/approve/<int:pk>/', views.approve_user, name='approve_user'),
+    path('user/reject/<int:pk>/', views.reject_user, name='reject_user'),
+
     path('admin/', admin.site.urls),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

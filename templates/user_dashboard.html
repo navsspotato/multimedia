@@ -168,38 +168,188 @@
             box-shadow: 0 0 0 2px var(--primary-blue); 
         }
 
-        .progress-track { display: flex; align-items: center; justify-content: space-between; position: relative; margin: 15px 0 5px; }
-        .progress-line { position: absolute; top: 50%; transform: translateY(-50%); left: 5px; right: 5px; height: 2px; background: var(--border-color); z-index: 0; }
-        .prog-step-container { display: flex; flex-direction: column; align-items: center; z-index: 1; position: relative; width: 50px; }
-        .prog-step { width: 12px; height: 12px; border-radius: 50%; background: white; border: 2px solid var(--border-color); margin-bottom: 4px; transition: 0.3s; }
+        .progress-track { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: relative; 
+            margin: 15px 0 5px; 
+        }
+
+        .progress-line { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            left: 5px; 
+            right: 5px; 
+            height: 2px; 
+            background: var(--border-color); 
+            z-index: 0; 
+        }
+
+        .prog-step-container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 1; 
+            position: relative; 
+            width: 50px; 
+        }
+
+        .prog-step { 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%; 
+            background: white; 
+            border: 2px solid var(--border-color); 
+            margin-bottom: 4px; 
+            transition: 0.3s; 
+        }
         
-        .prog-step.requested.active { background: var(--color-requested); border-color: var(--color-requested); box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2); }
-        .prog-step.approved.active { background: var(--color-approved); border-color: var(--color-approved); box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2); }
-        .prog-step.scheduled.active { background: var(--color-scheduled); border-color: var(--color-scheduled); box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2); }
-        .prog-step.ongoing.active { background: var(--color-ongoing); border-color: var(--color-ongoing); box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.2); }
-        .prog-step.done.active { background: var(--color-done); border-color: var(--color-done); box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2); }
-        .prog-step.completed-step { background: #cbd5e1; border-color: #cbd5e1; } 
+        .prog-step.requested.active { 
+            background: var(--color-requested); 
+            border-color: var(--color-requested); 
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2); 
+        }
 
-        .prog-label { font-size: 8px; font-weight: 700; color: #94a3b8; text-transform: uppercase; text-align: center; }
-        .prog-label.active { color: var(--navy); }
+        .prog-step.approved.active { 
+            background: var(--color-approved); 
+            border-color: var(--color-approved); 
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2); 
+        }
 
-        .badge-custom { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .bg-requested { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; }
-        .bg-approved { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-        .bg-scheduled { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
-        .bg-ongoing { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-        .bg-done { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+        .prog-step.scheduled.active { 
+            background: var(--color-scheduled); 
+            border-color: var(--color-scheduled); 
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2); 
+        }
 
-        .sidebar-footer { margin-top: auto; padding: 15px 20px; background: rgba(0, 0, 0, 0.2); }
-        .user-action-btn { background: none; border: none; width: 100%; text-align: left; padding: 8px; border-radius: 10px; transition: 0.2s; color: white; display: flex; align-items: center; justify-content: space-between; }
-        .user-action-btn:hover { background: rgba(255,255,255,0.08); }
+        .prog-step.ongoing.active { 
+            background: var(--color-ongoing); 
+            border-color: var(--color-ongoing); 
+            box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.2); 
+        }
+
+        .prog-step.done.active { 
+            background: var(--color-done); 
+            border-color: var(--color-done);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2); 
+        }
+
+        .prog-step.completed-step { 
+            background: #cbd5e1; 
+            border-color: #cbd5e1; 
+        } 
+
+        .prog-label { 
+            font-size: 8px; 
+            font-weight: 700; 
+            color: #94a3b8; 
+            text-transform: uppercase; 
+            text-align: center; 
+        }
+
+        .prog-label.active { 
+            color: var(--navy); 
+        }
+
+        .badge-custom { 
+            padding: 4px 10px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+        }
+
+        .bg-requested { 
+            background: #fefce8; 
+            color: #854d0e; 
+            border: 1px solid #fef08a; 
+        }
+
+        .bg-approved { 
+            background: #fffbeb; 
+            color: #92400e; 
+            border: 1px solid #fde68a; 
+        }
+
+        .bg-scheduled { 
+            background: #fff7ed; 
+            color: #9a3412; 
+            border: 1px solid #fed7aa; 
+        }
+        .bg-ongoing { 
+            background: #f0fdf4; 
+            color: #166534; 
+            border: 1px solid #bbf7d0; 
+        }
+        .bg-done { 
+            background: #dcfce7; 
+            color: #14532d; 
+            border: 1px solid #86efac; 
+        }
+
+        .sidebar-footer { 
+            margin-top: auto; 
+            padding: 15px 20px; 
+            background: rgba(0, 0, 0, 0.2); 
+        }
+
+        .user-action-btn { 
+            background: none; 
+            border: none; 
+            width: 100%; 
+            text-align: left; 
+            padding: 8px; 
+            border-radius: 10px; 
+            transition: 0.2s; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+
+        .user-action-btn:hover { 
+            background: rgba(255,255,255,0.08); 
+        }
         
-        .dropdown-menu { border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 8px; }
-        .dropdown-item { border-radius: 8px; font-size: 13px; font-weight: 600; color: #1e293b; padding: 10px 15px; display: flex; align-items: center; gap: 10px; }
-        .dropdown-item.text-danger:hover { background-color: #fef2f2; }
+        .dropdown-menu { 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            padding: 8px; 
+        }
 
-        .form-label { font-size: 12px; font-weight: 700; color: var(--navy); text-transform: uppercase; margin-bottom: 6px; }
-        .form-control, .form-select { border-radius: 10px; border: 1px solid var(--border-color); padding: 10px 14px; font-size: 14px; }
+        .dropdown-item { 
+            border-radius: 8px; 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: #1e293b; 
+            padding: 10px 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .dropdown-item.text-danger:hover { 
+            background-color: #fef2f2; 
+        }
+
+        .form-label { 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: var(--navy); 
+            text-transform: uppercase; 
+            margin-bottom: 6px; 
+        }
+
+        .form-control, .form-select { 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            padding: 10px 14px; 
+            font-size: 14px; 
+        }
+
     </style>
 </head>
 <body>
@@ -219,7 +369,6 @@
             </div>
         </div>
 
-        <!-- NAVIGATION -->
         <div class="mt-4">
 
             <div class="nav-link active"
@@ -325,7 +474,7 @@
                         </div>
 
                         <div class="stat-val">
-                            {{ requests|length }}
+                            {{ all_requests_count }}
                         </div>
                     </div>
                 </div>
@@ -337,7 +486,7 @@
                         </div>
 
                         <div class="stat-val">
-                            0
+                            {{ pending_requests_count }}
                         </div>
                     </div>
                 </div>
@@ -349,7 +498,7 @@
                         </div>
 
                         <div class="stat-val">
-                            0
+                            {{ completed_count }}
                         </div>
                     </div>
                 </div>
@@ -361,7 +510,7 @@
                         </div>
 
                         <div class="stat-val">
-                            0
+                            {{ not_started_count }}
                         </div>
                     </div>
                 </div>
@@ -475,11 +624,11 @@
 
                                     <option value="">Select Category</option>
                                     <option value="Graphic Design">Graphic Design</option>
-                                    <option value="Video Editing">Video Editing</option>
-                                    <option value="PowerPoint">PowerPoint</option>
-                                    <option value="Photography">Photography</option>
-                                    <option value="Publication">Publication</option>
-                                    <option value="Web Design">Web Design</option>
+                                    <option value="Audio-Visual Presentation">Audio-Visual Presentation</option>
+                                    <option value="Photography and Editing">Photography and Editing</option>
+                                    <option value="Web and Digital Design">Web and Digital Design</option>
+                                    <option value="Publication Design">Publication Design</option>
+                                    <option value="Branding and Identity">Branding and Identity</option>
 
                                 </select>
 
@@ -506,17 +655,17 @@
                                         required>
 
                                     <option value="">Select Type</option>
-                                    <option value="Tarpaulin Design">Tarpaulin Design</option>
-                                    <option value="Invitation Design">Invitation Design</option>
-                                    <option value="Newsletter Design">Newsletter Design</option>
-                                    <option value="ID Design">ID Design</option>
-                                    <option value="Photo Documentation">Photo Documentation</option>
-                                    <option value="Video Editing">Video Editing</option>
-                                    <option value="Certificate">Certificate</option>
-                                    <option value="Photo Editing">Photo Editing</option>
-                                    <option value="Social Media Pubmat">Social Media Pubmat</option>
+                                    <option value="Tarpaulin">Tarpaulin</option>
+                                    <option value="Invitation">Invitation</option>
                                     <option value="Newsletter">Newsletter</option>
-                                    <option value="PPT Presentation">PPT Presentation</option>
+                                    <option value="AVP">AVP</option>
+                                    <option value="T-shirt Design">T-shirt Design</option>
+                                    <option value="Photo Documentation">Photo Documentation</option>
+                                    <option value="Sticker Design">Sticker Design</option>
+                                    <option value="Certificate">Certificate</option>
+                                    <option value="Calendar">Calendar</option>
+                                    <option value="Photo Editing">Photo Editing</option>
+                                    <option value="Market Survey">Market Survey</option>
 
                                 </select>
 
@@ -548,6 +697,23 @@
 
                             </div>
 
+                            <!-- Delivery Type -->
+                            <div class="col-md-6">
+                                <label class="form-label">Delivery Type</label>
+                                <select name="delivery_type" class="form-select" id="delivery_type" onchange="toggleDeliveryDetail()">
+                                    <option value="">Select Delivery Type</option>
+                                    <option value="email">Email</option>
+                                    <option value="shared_drive">Shared Drive</option>
+                                </select>
+                            </div>
+
+                            <!-- Delivery Detail (shown conditionally) -->
+                            <div class="col-md-12" id="delivery_detail_wrapper" style="display:none;">
+                                <label class="form-label" id="delivery_detail_label"></label>
+                                <input type="text" name="delivery_detail"
+                                    class="form-control" id="delivery_detail_input">
+                            </div>
+
                             <div class="col-md-12">
 
                                 <label class="form-label">
@@ -561,6 +727,25 @@
 
                             </div>
 
+                            <!-- Attachments -->
+                            <div class="col-md-12">
+                                <label class="form-label">Attachments</label>
+                                <div class="dropzone-box border rounded-3 p-4 text-center"
+                                    id="dropzone"
+                                    style="border: 2px dashed #cbd5e1; background:#f8fafc; cursor:pointer;"
+                                    onclick="document.getElementById('attachment_input').click()"
+                                    ondragover="event.preventDefault(); this.style.borderColor='#2563eb';"
+                                    ondragleave="this.style.borderColor='#cbd5e1';"
+                                    ondrop="handleDrop(event)">
+                                    <i class="bi bi-cloud-arrow-up fs-2 text-muted"></i>
+                                    <p class="mb-0 fw-bold">Drag &amp; drop files or <span class="text-primary">browse</span></p>
+                                    <p class="text-muted small mb-0">All file types accepted</p>
+                                </div>
+                                <input type="file" name="attachments" id="attachment_input"
+                                        multiple style="display:none;"
+                                        onchange="renderFileList(this.files)">
+                                <div id="file_preview" class="mt-2 d-flex flex-column gap-2"></div>
+                            </div>
 
                         </div>
 
@@ -665,6 +850,96 @@
     </div>
 
 </body>
+
+<script>
+let allFiles = [];
+
+function toggleDeliveryDetail() {
+    const sel = document.getElementById('delivery_type');
+    const wrapper = document.getElementById('delivery_detail_wrapper');
+    const label = document.getElementById('delivery_detail_label');
+    const input = document.getElementById('delivery_detail_input');
+    if (sel.value === 'email') {
+        label.textContent = 'Recipient Email Address';
+        input.placeholder = 'e.g. recipient@cvmc.gov';
+        wrapper.style.display = '';
+    } else if (sel.value === 'shared_drive') {
+        label.textContent = 'Shared Drive Folder Link';
+        input.placeholder = 'e.g. https://drive.google.com/...';
+        wrapper.style.display = '';
+    } else {
+        wrapper.style.display = 'none';
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').style.borderColor = '#cbd5e1';
+    addFiles(Array.from(e.dataTransfer.files));
+}
+
+function renderFileList(incoming) {
+    addFiles(Array.from(incoming));
+}
+
+function addFiles(newFiles) {
+    newFiles.forEach(f => {
+        if (!allFiles.find(x => x.name === f.name && x.size === f.size))
+            allFiles.push(f);
+    });
+    updateInput();
+    renderPreview();
+}
+
+function removeFile(idx) {
+    allFiles.splice(idx, 1);
+    updateInput();
+    renderPreview();
+}
+
+function updateInput() {
+    const dt = new DataTransfer();
+    allFiles.forEach(f => dt.items.add(f));
+    document.getElementById('attachment_input').files = dt.files;
+}
+
+function renderPreview() {
+    const container = document.getElementById('file_preview');
+    container.innerHTML = '';
+    allFiles.forEach((f, i) => {
+        const isImg = f.type.startsWith('image/');
+        const div = document.createElement('div');
+        div.className = 'd-flex align-items-center gap-3 p-2 border rounded-3 bg-white';
+        div.style = 'font-size:13px;';
+
+        if (isImg) {
+            const img = document.createElement('img');
+            img.style = 'width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;';
+            const reader = new FileReader();
+            reader.onload = e => img.src = e.target.result;
+            reader.readAsDataURL(f);
+            div.appendChild(img);
+        } else {
+            div.innerHTML += `<div style="width:36px;height:36px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;"><i class="bi bi-file-earmark text-muted"></i></div>`;
+        }
+
+        const info = document.createElement('div');
+        info.className = 'flex-grow-1 overflow-hidden';
+        info.innerHTML = `<div class="fw-bold text-truncate">${f.name}</div>
+                          <div class="text-muted">${(f.size/1024).toFixed(1)} KB</div>`;
+        div.appendChild(info);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-sm btn-light';
+        btn.innerHTML = '<i class="bi bi-x"></i>';
+        btn.onclick = () => removeFile(i);
+        div.appendChild(btn);
+
+        container.appendChild(div);
+    });
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 

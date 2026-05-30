@@ -543,7 +543,13 @@
             <i class="bi bi-tag-fill"></i> By Category
         </a>
 
-        
+        <a class="nav-item" id="nav-approvals" onclick="switchView('approvals', this)">
+            <i class="bi bi-person-check-fill"></i> User Approvals
+            {% if pending_count %}
+            <span class="nav-badge" style="background:#ef4444;">{{ pending_count }}</span>
+            {% endif %}
+        </a>
+    
     </div>
 
     <div class="sidebar-footer dropdown">
@@ -591,17 +597,17 @@
         <div class="icon-btn" id="notif-btn" onclick="toggleNotif()">
             <i class="bi bi-bell-fill"></i>
             {% if requested_tasks %}
-            <span class="notif-badge">{{ requested_tasks|length }}</span>
+            <span class="notif-badge" id="notif-count">{{ requested_tasks|length }}</span>
             {% endif %}
 
             <div class="notif-dropdown" id="notif-dropdown" onclick="event.stopPropagation()">
                 <div class="notif-header">
-                    <span>🔔 New Requests <span style="color:#ef4444;">({{ requested_tasks|length }})</span></span>
+                    <span>🔔 New Request</span>
                     <a href="#" onclick="markAllRead()">Mark all read</a>
                 </div>
                 <div class="notif-list" id="notif-list">
                     {% for task in requested_tasks %}
-                    <div class="notif-item" onclick="goToTasks()">
+                    <div class="notif-item" id="notif-item-{{ task.pk }}" onclick="readAndGo({{ task.pk }})">
                         <div class="notif-dot" id="dot-{{ task.pk }}"></div>
                         <div>
                             <div class="notif-text">
@@ -736,6 +742,9 @@
                                 <th>Date Started</th>
                                 <th>Date Completed</th>
                                 <th>Due Date</th>
+                                <th>Target Date</th>
+                                <th>Delivery Type</th>
+                                <th>Attachments</th>
                                 <th>Staff Assigned</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -754,9 +763,56 @@
                                 <td style="font-size:12px; color:#64748b;">{{ task.date_started|date:"M d"|default:"—" }}</td>
                                 <td style="font-size:12px; color:#64748b;">{{ task.date_completed|date:"M d"|default:"—" }}</td>
                                 <td style="font-size:12px; color:#64748b;">{{ task.due_date|date:"M d"|default:"—" }}</td>
-                                <td style="font-size:12px; font-weight:700;">{{ task.assigned_to|default:"—" }}</td>
+                                <td style="font-size:12px; color:#64748b;">{{ task.target_date|date:"M d, Y"|default:"—" }}</td>
                                 <td>
-                                    <!-- Inline status update form -->
+                                    {% if task.delivery_type == 'email' %}
+                                        <span class="badge-type" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
+                                            <i class="bi bi-envelope-fill" style="font-size:10px;"></i> Email
+                                        </span>
+                                    {% elif task.delivery_type == 'shared_drive' %}
+                                        <span class="badge-type" style="background:#f0fdf4; color:#15803d; border-color:#bbf7d0;">
+                                            <i class="bi bi-folder2-open" style="font-size:10px;"></i> Shared Drive
+                                        </span>
+                                    {% else %}
+                                        <span style="color:#cbd5e1; font-size:12px;">—</span>
+                                    {% endif %}
+                                    {% if task.delivery_detail %}
+                                        <div style="font-size:10px; color:#94a3b8; margin-top:3px; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                                            title="{{ task.delivery_detail }}">
+                                            {{ task.delivery_detail }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% with attachments=task.attachments.all %}
+                                    {% if attachments %}
+                                        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                                        {% for att in attachments %}
+                                            {% if att.file.name|lower|slice:"-3:" == "jpg" or att.file.name|lower|slice:"-3:" == "png" or att.file.name|lower|slice:"-4:" == "jpeg" or att.file.name|lower|slice:"-4:" == "webp" %}
+                                                <a href="{{ att.file.url }}" target="_blank" title="{{ att.file.name }}">
+                                                    <img src="{{ att.file.url }}"
+                                                        style="width:32px; height:32px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ att.file.url }}" target="_blank" title="{{ att.file.name }}"
+                                                    class="btn-action" style="font-size:13px;">
+                                                        <i class="bi bi-file-earmark"></i>
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </div>
+                                        <div style="font-size:10px; color:#94a3b8; margin-top:3px;">
+                                            {{ attachments|length }} file{{ attachments|length|pluralize }}
+                                        </div>
+                                    {% else %}
+                                        <span style="color:#cbd5e1; font-size:12px;">—</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td style="font-size:12px; font-weight:700;">{{ task.assigned_to|default:"—" }}</td>
+
+                                <td>
                                     <form method="POST" action="{% url 'update_request' task.pk %}">
                                         {% csrf_token %}
                                         <select name="status" class="status-select"
@@ -792,7 +848,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="13">
+                                <td colspan="16">
                                     <div class="empty-state">
                                         <i class="bi bi-inbox"></i>
                                         <p>No tasks match your filters.</p>
@@ -824,38 +880,293 @@
 
  
         <section id="view-categories" class="view-section">
-            <div class="mb-4">
-                <h5 class="fw-bold" style="color:var(--navy);">Tasks by Category</h5>
-                <p style="font-size:13px; color:#94a3b8;">Breakdown of all multimedia requests per category.</p>
+
+            <!-- tab switcher -->
+            <div style="display:flex; gap:8px; margin-bottom:24px;">
+                <button onclick="switchCatTab('category')" id="tab-category"
+                    style="padding:7px 20px; border-radius:20px; font-size:13px; font-weight:700; cursor:pointer; border:1px solid var(--primary); background:var(--primary); color:#fff;">
+                    By Category
+                </button>
+                <button onclick="switchCatTab('division')" id="tab-division"
+                    style="padding:7px 20px; border-radius:20px; font-size:13px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:#64748b;">
+                    By Division
+                </button>
             </div>
-            <div class="cat-overview">
+
+            <!-- category tab -->
+            <div id="cat-tab-content">
+
+                <div id="cat-grid-view">
+                    <div class="mb-4">
+                        <h5 class="fw-bold" style="color:var(--navy);">Tasks by Category</h5>
+                        <p style="font-size:13px; color:#94a3b8;">Click a category to see detailed requests.</p>
+                    </div>
+                    <div class="cat-overview">
+                        {% for cat in category_stats %}
+                        <div class="cat-card" onclick="showCatDetail('{{ cat.name|escapejs }}')" style="cursor:pointer;">
+                            <div class="cat-card-title">{{ cat.name }}</div>
+                            <div class="cat-stat-row">
+                                <div class="cat-count">{{ cat.count }}</div>
+                                <span class="badge-status bs-completed" style="font-size:11px;">{{ cat.completed }} done</span>
+                            </div>
+                            <div class="progress-bar-mini" style="height:8px;">
+                                <div class="progress-bar-fill"
+                                    style="width: {% if cat.count %}{% widthratio cat.completed cat.count 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                            <div style="font-size:11px; color:#94a3b8; margin-top:6px; font-weight:600;">
+                                {{ cat.ongoing }} ongoing · {{ cat.requested }} requested
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p style="color:#94a3b8;">No categories found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+          
                 {% for cat in category_stats %}
-                <div class="cat-card">
-                    <div class="cat-card-title">{{ cat.name }}</div>
-                    <div class="cat-stat-row">
-                        <div class="cat-count">{{ cat.count }}</div>
-                        <span class="badge-status bs-completed" style="font-size:11px;">
-                            {{ cat.completed }} done
+                <div id="cat-detail-{{ cat.name|slugify }}" style="display:none;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <button onclick="showCatGrid()" class="btn-action" style="width:auto; padding:7px 16px; display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;">
+                            <i class="bi bi-arrow-left"></i> All Categories
+                        </button>
+                        <h5 class="fw-bold mb-0" style="color:var(--navy);">{{ cat.name }}</h5>
+                    </div>
+                    <div class="stats-row mb-4">
+                        <div class="scard"><div class="scard-accent" style="background:#2563eb;"></div><div class="scard-label">Total</div><div class="scard-val">{{ cat.count }}</div><i class="bi bi-stack scard-icon"></i></div>
+                        <div class="scard"><div class="scard-accent" style="background:#22c55e;"></div><div class="scard-label">Completed</div><div class="scard-val" style="color:#15803d;">{{ cat.completed }}</div><i class="bi bi-check-circle scard-icon"></i></div>
+                        <div class="scard"><div class="scard-accent" style="background:#38bdf8;"></div><div class="scard-label">Ongoing</div><div class="scard-val" style="color:#0369a1;">{{ cat.ongoing }}</div><i class="bi bi-hourglass-split scard-icon"></i></div>
+                        <div class="scard"><div class="scard-accent" style="background:#facc15;"></div><div class="scard-label">Requested</div><div class="scard-val" style="color:#92400e;">{{ cat.requested }}</div><i class="bi bi-bell scard-icon"></i></div>
+                    </div>
+                    <div class="table-card mb-4">
+                        <div class="table-card-header"><div class="table-card-title">Requests by Division</div></div>
+                        <div style="padding:1rem 1.25rem; display:flex; gap:10px; flex-wrap:wrap;">
+                            {% for div in cat.division_breakdown %}
+                            <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; align-items:center; gap:10px;">
+                                <span style="font-size:13px; font-weight:700; color:var(--navy);">{{ div.division|default:"Unknown" }}</span>
+                                <span class="badge-status bs-ongoing" style="font-size:11px;">{{ div.count }} request{{ div.count|pluralize }}</span>
+                            </div>
+                            {% empty %}
+                            <p style="color:#94a3b8; font-size:13px;">No requests yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-card-header">
+                            <div class="table-card-title">All Requests <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:8px;">({{ cat.count }} record{{ cat.count|pluralize }})</span></div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr><th>#</th><th>Project</th><th>Division</th><th>Unit</th><th>Target Date</th><th>Date Requested</th><th>Staff</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in cat.requests %}
+                                    <tr>
+                                        <td class="text-muted fw-bold" style="font-size:12px;">{{ forloop.counter }}</td>
+                                        <td class="fw-bold">{{ req.project_title }}</td>
+                                        <td style="font-size:12px; font-weight:600;">{{ req.division }}</td>
+                                        <td style="font-size:12px; color:#64748b;">{{ req.unit|default:"—" }}</td>
+                                        <td style="font-size:12px; color:#64748b;">{{ req.target_date|date:"M d, Y"|default:"—" }}</td>
+                                        <td style="font-size:12px; color:#64748b;">{{ req.date_requested|date:"M d, Y" }}</td>
+                                        <td style="font-size:12px; font-weight:700;">{{ req.assigned_to|default:"—" }}</td>
+                                        <td><span class="badge-status bs-{{ req.status|lower|cut:' ' }}">{{ req.status }}</span></td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="8"><div class="empty-state"><i class="bi bi-inbox"></i><p>No requests.</p></div></td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- division tab -->
+            <div id="div-tab-content" style="display:none;">
+
+                <div id="div-grid-view">
+                    <div class="mb-4">
+                        <h5 class="fw-bold" style="color:var(--navy);">Tasks by Division</h5>
+                        <p style="font-size:13px; color:#94a3b8;">Click a division to see detailed requests.</p>
+                    </div>
+
+                    <!-- month filter bar -->
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 18px; flex-wrap:wrap;">
+                        <span style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:#94a3b8;">Filter by Month</span>
+                        <a href="?month=all" onclick="switchView('categories', document.getElementById('nav-categories'))"
+                            style="padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; text-decoration:none;
+                                    border:1px solid {% if selected_month == 'all' %}var(--primary){% else %}var(--border){% endif %};
+                                    background:{% if selected_month == 'all' %}var(--primary){% else %}var(--bg){% endif %};
+                                    color:{% if selected_month == 'all' %}#fff{% else %}#64748b{% endif %};">
+                            All Time
+                        </a>
+                        {% for month in available_months %}
+                        <a href="?month={{ month|date:'Y-m' }}" onclick="switchView('categories', document.getElementById('nav-categories'))"
+                            style="padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; text-decoration:none;
+                                border:1px solid {% if selected_month == month|date:'Y-m' %}var(--primary){% else %}var(--border){% endif %};
+                                background:{% if selected_month == month|date:'Y-m' %}var(--primary){% else %}var(--bg){% endif %};
+                                color:{% if selected_month == month|date:'Y-m' %}#fff{% else %}#64748b{% endif %};">
+                            {{ month|date:"M Y" }}
+                        </a>
+                        {% endfor %}
+                        <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:auto;">
+                            {% if selected_month == 'all' %}Showing all divisions{% else %}Filtered: {{ selected_month }}{% endif %}
                         </span>
                     </div>
-                   <div class="progress-bar-mini" style="height:8px;">
-                      <div class="progress-bar-fill"
-                        style="width: {% if cat.count %}{% widthratio cat.completed cat.count 100 %}{% else %}0{% endif %}%;"></div>
-                      </div>
-                    <div style="font-size:11px; color:#94a3b8; margin-top:6px; font-weight:600;">
-                        {{ cat.in_progress }} in progress · {{ cat.not_started }} not started
+
+                    <div class="cat-overview">
+                        {% for div in division_stats %}
+                        <div class="cat-card {% if div.count == 0 %}opacity-50{% endif %}"
+                            onclick="{% if div.count > 0 %}showDivDetail('{{ div.name|escapejs }}'){% endif %}"
+                            style="cursor:{% if div.count > 0 %}pointer{% else %}default{% endif %};">
+                            <div class="cat-card-title">{{ div.name }}</div>
+                            <div class="cat-stat-row">
+                                <div class="cat-count">{{ div.count }}</div>
+                                <span class="badge-status bs-completed" style="font-size:11px;">{{ div.completed }} done</span>
+                            </div>
+                            <div class="progress-bar-mini" style="height:8px;">
+                                <div class="progress-bar-fill"
+                                    style="width:{% if div.count %}{% widthratio div.completed div.count 100 %}{% else %}0{% endif %}%;"></div>
+                            </div>
+                            <div style="font-size:11px; color:#94a3b8; margin-top:6px; font-weight:600;">
+                                {{ div.ongoing }} ongoing · {{ div.requested }} requested
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p style="color:#94a3b8;">No divisions found.</p>
+                        {% endfor %}
                     </div>
                 </div>
-                {% empty %}
+                <!-- end div-grid-view -->
 
-                {% for item in "123456"|make_list %}
-                <div class="cat-card">
-                    <div class="cat-card-title" style="color:#cbd5e1;">Loading…</div>
-                    <div class="cat-count" style="color:#e2e8f0;">—</div>
-                    <div class="progress-bar-mini"><div class="progress-bar-fill" style="width:0%;"></div></div>
+            {% for div in division_stats %}
+            <div id="div-detail-{{ div.name|slugify }}" style="display:none;">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <button onclick="showDivGrid()" class="btn-action" style="width:auto; padding:7px 16px; display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;">
+                        <i class="bi bi-arrow-left"></i> All Divisions
+                    </button>
+                    <h5 class="fw-bold mb-0" style="color:var(--navy);">{{ div.name }}</h5>
                 </div>
-                {% endfor %}
-                {% endfor %}
+                <div class="stats-row mb-4">
+                    <div class="scard"><div class="scard-accent" style="background:#2563eb;"></div><div class="scard-label">Total</div><div class="scard-val">{{ div.count }}</div><i class="bi bi-stack scard-icon"></i></div>
+                    <div class="scard"><div class="scard-accent" style="background:#22c55e;"></div><div class="scard-label">Completed</div><div class="scard-val" style="color:#15803d;">{{ div.completed }}</div><i class="bi bi-check-circle scard-icon"></i></div>
+                    <div class="scard"><div class="scard-accent" style="background:#38bdf8;"></div><div class="scard-label">Ongoing</div><div class="scard-val" style="color:#0369a1;">{{ div.ongoing }}</div><i class="bi bi-hourglass-split scard-icon"></i></div>
+                    <div class="scard"><div class="scard-accent" style="background:#facc15;"></div><div class="scard-label">Requested</div><div class="scard-val" style="color:#92400e;">{{ div.requested }}</div><i class="bi bi-bell scard-icon"></i></div>
+                </div>
+                <div class="table-card mb-4">
+                    <div class="table-card-header"><div class="table-card-title">Requests by Category</div></div>
+                    <div style="padding:1rem 1.25rem; display:flex; gap:10px; flex-wrap:wrap;">
+                        {% for cat in div.category_breakdown %}
+                        <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px 16px; display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:13px; font-weight:700; color:var(--navy);">{{ cat.category|default:"Unknown" }}</span>
+                            <span class="badge-status bs-ongoing" style="font-size:11px;">{{ cat.count }} request{{ cat.count|pluralize }}</span>
+                        </div>
+                        {% empty %}
+                        <p style="color:#94a3b8; font-size:13px;">No requests yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <div class="table-card-title">All Requests <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:8px;">({{ div.count }} record{{ div.count|pluralize }})</span></div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr><th>#</th><th>Project</th><th>Type</th><th>Category</th><th>Unit</th><th>Target Date</th><th>Date Requested</th><th>Staff</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for req in div.requests %}
+                                <tr>
+                                    <td class="text-muted fw-bold" style="font-size:12px;">{{ forloop.counter }}</td>
+                                    <td class="fw-bold">{{ req.project_title }}</td>
+                                    <td><span class="badge-type">{{ req.request_type }}</span></td>
+                                    <td style="font-size:11px; color:#64748b; font-weight:700;">{{ req.category|upper }}</td>
+                                    <td style="font-size:12px; color:#64748b;">{{ req.unit|default:"—" }}</td>
+                                    <td style="font-size:12px; color:#64748b;">{{ req.target_date|date:"M d, Y"|default:"—" }}</td>
+                                    <td style="font-size:12px; color:#64748b;">{{ req.date_requested|date:"M d, Y" }}</td>
+                                    <td style="font-size:12px; font-weight:700;">{{ req.assigned_to|default:"—" }}</td>
+                                    <td><span class="badge-status bs-{{ req.status|lower|cut:' ' }}">{{ req.status }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="9"><div class="empty-state"><i class="bi bi-inbox"></i><p>No requests.</p></div></td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            </div>
+            <!-- end div-tab-content -->
+
+        </section>
+
+        <section id="view-approvals" class="view-section">
+            <div class="table-card">
+                <div class="table-card-header">
+                    <div class="table-card-title">
+                        Pending User Approvals
+                        <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:8px;">
+                            ({{ pending_count }} pending)
+                        </span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Date Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in pending_users %}
+                            <tr>
+                                <td class="text-muted fw-bold" style="font-size:12px;">{{ forloop.counter }}</td>
+                                <td class="fw-bold">{{ u.full_name|default:u.username }}</td>
+                                <td style="font-size:12px; color:#64748b;">{{ u.email }}</td>
+                                <td>
+                                    <span class="badge-type">{{ u.get_role_display }}</span>
+                                </td>
+                                <td style="font-size:12px; color:#64748b;">{{ u.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="action-group">
+                                        <a onclick="openApproveModal('{% url 'approve_user' u.pk %}', '{{ u.full_name }}', '{{ u.email }}', '{{ u.get_role_display }}')"
+                                            class="btn-action"
+                                            style="background:#dcfce7; border-color:#bbf7d0; color:#15803d; cursor:pointer;"
+                                            title="Approve">
+                                                <i class="bi bi-check-lg"></i>
+                                        </a>
+                                        <a onclick="openRejectModal('{% url 'reject_user' u.pk %}', '{{ u.full_name }}', '{{ u.email }}', '{{ u.get_role_display }}')"
+                                            class="btn-action danger"
+                                            title="Reject & Delete"
+                                            style="cursor:pointer;">
+                                                <i class="bi bi-x-lg"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="bi bi-person-check"></i>
+                                        <p>No pending approvals.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -964,6 +1275,7 @@
         'overview':   'OVERVIEW',
         'tasks':      'ALL TASKS',
         'categories': 'BY CATEGORY',
+        'approvals':  'USER APPROVALS',
     };
 
     function switchView(id, el) {
@@ -981,8 +1293,41 @@
      
     }
 
+    const readNotifs = new Set(JSON.parse(localStorage.getItem('readNotifs') || '[]'));
+
+    function applyReadState() {
+        let unread = 0;
+        document.querySelectorAll('.notif-item').forEach(item => {
+            const id = item.id.replace('notif-item-', '');
+            const dot = document.getElementById('dot-' + id);
+            if (readNotifs.has(id)) {
+                if (dot) dot.classList.add('read');
+                item.style.opacity = '0.6';
+            } else {
+                unread++;
+            }
+        });
+        const badge = document.getElementById('notif-count');
+        if (badge) {
+            if (unread > 0) {
+                badge.textContent = unread;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+
     function toggleNotif() {
-    document.getElementById('notif-dropdown').classList.toggle('open');
+        document.getElementById('notif-dropdown').classList.toggle('open');
+    }
+
+    function readAndGo(id) {
+        readNotifs.add(String(id));
+        localStorage.setItem('readNotifs', JSON.stringify([...readNotifs]));
+        applyReadState();
+        document.getElementById('notif-dropdown').classList.remove('open');
+        switchView('tasks', document.getElementById('nav-tasks'));
     }
 
     function goToTasks() {
@@ -991,20 +1336,111 @@
     }
 
     function markAllRead() {
-        document.querySelectorAll('.notif-dot').forEach(d => d.classList.add('read'));
-        const badge = document.querySelector('.notif-badge');
-        if (badge) badge.remove();
+        document.querySelectorAll('.notif-item').forEach(item => {
+            const id = item.id.replace('notif-item-', '');
+            readNotifs.add(id);
+        });
+        localStorage.setItem('readNotifs', JSON.stringify([...readNotifs]));
+        applyReadState();
         document.getElementById('notif-dropdown').classList.remove('open');
     }
+
+    applyReadState();
 
     document.addEventListener('click', function(e) {
         const btn = document.getElementById('notif-btn');
         if (btn && !btn.contains(e.target)) {
             document.getElementById('notif-dropdown').classList.remove('open');
         }
-});
 
-    // Highlight status select by value
+    });
+
+    function openApproveModal(url, name, email, role) {
+        const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        document.getElementById('modal-avatar').textContent = initials;
+        document.getElementById('modal-name').textContent = name;
+        document.getElementById('modal-meta').textContent = email + ' · ' + role;
+        document.getElementById('modal-confirm-btn').href = url;
+        document.getElementById('approveModal').style.display = 'flex';
+    }
+
+    function closeApproveModal() {
+        document.getElementById('approveModal').style.display = 'none';
+    }
+
+    function openRejectModal(url, name, email, role) {
+        const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        document.getElementById('reject-modal-avatar').textContent = initials;
+        document.getElementById('reject-modal-name').textContent = name;
+        document.getElementById('reject-modal-meta').textContent = email + ' · ' + role;
+        document.getElementById('reject-confirm-btn').href = url;
+        document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').style.display = 'none';
+    }
+
+    function switchCatTab(tab) {
+        const catContent = document.getElementById('cat-tab-content');
+        const divContent = document.getElementById('div-tab-content');
+        const tabCat = document.getElementById('tab-category');
+        const tabDiv = document.getElementById('tab-division');
+        if (tab === 'category') {
+            catContent.style.display = 'block';
+            divContent.style.display = 'none';
+            tabCat.style.background = 'var(--primary)'; tabCat.style.color = '#fff'; tabCat.style.borderColor = 'var(--primary)';
+            tabDiv.style.background = 'var(--surface)'; tabDiv.style.color = '#64748b'; tabDiv.style.borderColor = 'var(--border)';
+        } else {
+            catContent.style.display = 'none';
+            divContent.style.display = 'block';
+            tabDiv.style.background = 'var(--primary)'; tabDiv.style.color = '#fff'; tabDiv.style.borderColor = 'var(--primary)';
+            tabCat.style.background = 'var(--surface)'; tabCat.style.color = '#64748b'; tabCat.style.borderColor = 'var(--border)';
+        }
+    }
+
+    function showCatDetail(name) {
+        document.getElementById('cat-grid-view').style.display = 'none';
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        document.querySelectorAll('[id^="cat-detail-"]').forEach(el => el.style.display = 'none');
+        const detail = document.getElementById('cat-detail-' + slug);
+        if (detail) detail.style.display = 'block';
+    }
+
+    function showCatGrid() {
+        document.querySelectorAll('[id^="cat-detail-"]').forEach(el => el.style.display = 'none');
+        document.getElementById('cat-grid-view').style.display = 'block';
+    }
+
+    function showDivDetail(name) {
+        document.getElementById('div-grid-view').style.display = 'none';
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        document.querySelectorAll('[id^="div-detail-"]').forEach(el => el.style.display = 'none');
+        const detail = document.getElementById('div-detail-' + slug);
+        if (detail) detail.style.display = 'block';
+    }
+
+    function showDivGrid() {
+        document.querySelectorAll('[id^="div-detail-"]').forEach(el => el.style.display = 'none');
+        document.getElementById('div-grid-view').style.display = 'block';
+    }
+
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('month')) {
+            switchView('categories', document.getElementById('nav-categories'));
+            setTimeout(() => switchCatTab('division'), 50);
+        }
+    })();
+
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('view') === 'tasks') {
+            switchView('tasks', document.getElementById('nav-tasks'));
+            document.querySelector('.content').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    })();
+
     document.querySelectorAll('.status-select').forEach(sel => {
         const colorMap = {
             'completed':   '#dcfce7',
@@ -1022,5 +1458,75 @@
         });
     });
 </script>
+
+
+<div id="approveModal" style="display:none; position:fixed; inset:0; background:rgba(15,31,61,0.55); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:20px; border:1px solid #e2e8f0; padding:2rem; max-width:380px; width:90%; text-align:center;">
+        
+        <div style="width:56px; height:56px; border-radius:50%; background:#dcfce7; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem;">
+            <i class="bi bi-person-check-fill" style="font-size:24px; color:#15803d;"></i>
+        </div>
+
+        <h5 class="fw-bold" style="color:#0f1f3d; margin-bottom:6px;">Approve this user?</h5>
+        <p style="font-size:13px; color:#64748b; margin-bottom:1.25rem;">You're about to grant access to:</p>
+
+        <div style="background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:1.25rem; text-align:left;">
+            <div id="modal-avatar" style="width:40px; height:40px; border-radius:50%; background:#dbeafe; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#1d4ed8; flex-shrink:0;"></div>
+            <div>
+                <p id="modal-name" style="font-size:14px; font-weight:700; color:#0f1f3d; margin:0;"></p>
+                <p id="modal-meta" style="font-size:12px; color:#64748b; margin:0;"></p>
+            </div>
+        </div>
+
+        <p style="font-size:12px; color:#94a3b8; margin-bottom:1.25rem;">Once approved, this user can log in and submit requests.</p>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeApproveModal()" style="flex:1; padding:10px; border-radius:10px; border:1px solid #e2e8f0; background:transparent; font-size:14px; cursor:pointer; color:#1e293b; font-weight:600;">
+                Cancel
+            </button>
+            <a id="modal-confirm-btn" href="#" style="flex:1; padding:10px; border-radius:10px; border:none; background:#dcfce7; color:#15803d; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none;">
+                <i class="bi bi-check-lg"></i> Approve
+            </a>
+        </div>
+
+        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid #f1f5f9;">
+            <p style="font-size:11px; color:#94a3b8; margin:0;">
+                <i class="bi bi-shield-check"></i> This action is logged and can be reviewed by administrators.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="rejectModal" style="display:none; position:fixed; inset:0; background:rgba(15,31,61,0.55); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:20px; border:1px solid #e2e8f0; padding:2rem; max-width:380px; width:90%; text-align:center;">
+        
+        <div style="width:56px; height:56px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem;">
+            <i class="bi bi-person-x-fill" style="font-size:24px; color:#dc2626;"></i>
+        </div>
+
+        <h5 class="fw-bold" style="color:#0f1f3d; margin-bottom:6px;">Reject this user?</h5>
+        <p style="font-size:13px; color:#64748b; margin-bottom:1.25rem;">This will permanently delete the account of:</p>
+
+        <div style="background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:1.25rem; text-align:left;">
+            <div id="reject-modal-avatar" style="width:40px; height:40px; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#dc2626; flex-shrink:0;"></div>
+            <div>
+                <p id="reject-modal-name" style="font-size:14px; font-weight:700; color:#0f1f3d; margin:0;"></p>
+                <p id="reject-modal-meta" style="font-size:12px; color:#64748b; margin:0;"></p>
+            </div>
+        </div>
+
+        <p style="font-size:12px; color:#94a3b8; margin-bottom:1.25rem;">This action cannot be undone.</p>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeRejectModal()" style="flex:1; padding:10px; border-radius:10px; border:1px solid #e2e8f0; background:transparent; font-size:14px; cursor:pointer; color:#1e293b; font-weight:600;">
+                Cancel
+            </button>
+            <a id="reject-confirm-btn" href="#" style="flex:1; padding:10px; border-radius:10px; border:none; background:#fee2e2; color:#dc2626; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none;">
+                <i class="bi bi-x-lg"></i> Reject
+            </a>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
