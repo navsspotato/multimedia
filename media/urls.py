@@ -23,5 +23,8 @@ urlpatterns = [
     path('user/approve/<int:pk>/', views.approve_user, name='approve_user'),
     path('user/reject/<int:pk>/', views.reject_user, name='reject_user'),
 
+    path('export/excel/', views.export_excel, name='export_excel'),
+    path('export/pdf/', views.export_pdf, name='export_pdf'),
+
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

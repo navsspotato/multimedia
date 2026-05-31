@@ -5,6 +5,14 @@ from django.contrib.auth import authenticate, login as auth_login
 from app.models import Request, RequestAttachment
 from datetime import date, datetime
 from django.db.models import Count
+import openpyxl # For Excel export
+from openpyxl.styles import Font, PatternFill, Alignment
+from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from django.http import HttpResponse
+import io
 
 User = get_user_model()
 
@@ -346,6 +354,197 @@ def register_view(request):
         )
         return redirect('pending_approval')
     return render(request, 'register.html')
+
+@login_required
+def export_excel(request):
+    if request.user.role != 'admin':
+        return redirect('dashboard')
+
+    export_type = request.GET.get('type', 'tasks')
+    wb = openpyxl.Workbook()
+
+    header_font = Font(bold=True, color='FFFFFF', size=11)
+    header_fill = PatternFill(start_color='0F1F3D', end_color='0F1F3D', fill_type='solid')
+    center = Alignment(horizontal='center', vertical='center')
+
+    tasks = Request.objects.all().order_by('-date_requested')
+
+    if export_type == 'tasks' or export_type == 'all':
+        ws = wb.active
+        ws.title = 'All Tasks'
+        headers = ['#', 'Date Requested', 'Division', 'Unit', 'Project Title',
+                   'Type', 'Category', 'Target Date', 'Status', 'Staff Assigned',
+                   'Delivery Type', 'Date Started', 'Date Completed']
+        for col, h in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=h)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center
+        for i, task in enumerate(tasks, 1):
+            ws.append([
+                i,
+                task.date_requested.strftime('%b %d, %Y') if task.date_requested else '—',
+                task.division or '—',
+                task.unit or '—',
+                task.project_title,
+                task.request_type or '—',
+                task.category or '—',
+                task.target_date.strftime('%b %d, %Y') if task.target_date else '—',
+                task.status,
+                str(task.assigned_to) if task.assigned_to else '—',
+                task.get_delivery_type_display() if task.delivery_type else '—',
+                task.date_started.strftime('%b %d, %Y') if task.date_started else '—',
+                task.date_completed.strftime('%b %d, %Y') if task.date_completed else '—',
+            ])
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = max_len + 4
+
+    if export_type == 'category' or export_type == 'all':
+        ws2 = wb.create_sheet('By Category')
+        cat_headers = ['#', 'Category', 'Total', 'Completed', 'Ongoing', 'Requested']
+        for col, h in enumerate(cat_headers, 1):
+            cell = ws2.cell(row=1, column=col, value=h)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center
+        categories = ['Graphic Design', 'Audio-Visual Presentation',
+                      'Photography and Editing', 'Web and Digital Design',
+                      'Publication Design', 'Branding and Identity']
+        for i, cat in enumerate(categories, 1):
+            ct = tasks.filter(category__iexact=cat)
+            ws2.append([i, cat, ct.count(),
+                        ct.filter(status='Completed').count(),
+                        ct.filter(status='Ongoing').count(),
+                        ct.filter(status='Requested').count()])
+        for col in ws2.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws2.column_dimensions[col[0].column_letter].width = max_len + 4
+
+    if export_type == 'division' or export_type == 'all':
+        ws3 = wb.create_sheet('By Division')
+        div_headers = ['#', 'Division', 'Total', 'Completed', 'Ongoing', 'Requested']
+        for col, h in enumerate(div_headers, 1):
+            cell = ws3.cell(row=1, column=col, value=h)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = center
+        divisions = tasks.values_list('division', flat=True).distinct()
+        for i, div in enumerate(divisions, 1):
+            if not div:
+                continue
+            dt = tasks.filter(division=div)
+            ws3.append([i, div, dt.count(),
+                        dt.filter(status='Completed').count(),
+                        dt.filter(status='Ongoing').count(),
+                        dt.filter(status='Requested').count()])
+        for col in ws3.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws3.column_dimensions[col[0].column_letter].width = max_len + 4
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f'CVMC_Multimedia_Report_{export_type}.xlsx'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    wb.save(response)
+    return response
+
+
+@login_required # Only admins can export PDF reports
+def export_pdf(request):
+    if request.user.role != 'admin':
+        return redirect('dashboard')
+
+    export_type = request.GET.get('type', 'tasks')
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(A4),
+                            rightMargin=20, leftMargin=20,
+                            topMargin=30, bottomMargin=20)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    header_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F1F3D')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f4fa')]),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('ROWHEIGHT', (0, 0), (-1, -1), 20),
+    ])
+
+    tasks = Request.objects.all().order_by('-date_requested')
+
+    if export_type == 'tasks' or export_type == 'all':
+        elements.append(Paragraph('All Tasks Report', styles['Title']))
+        elements.append(Paragraph('CVMC Multimedia Task Management Tracker', styles['Normal']))
+        elements.append(Spacer(1, 12))
+        data = [['#', 'Date', 'Division', 'Unit', 'Project', 'Type', 'Category', 'Target', 'Status', 'Staff']]
+        for i, task in enumerate(tasks, 1):
+            data.append([
+                str(i),
+                task.date_requested.strftime('%b %d') if task.date_requested else '—',
+                task.division or '—',
+                (task.unit or '—')[:15],
+                task.project_title[:20],
+                (task.request_type or '—')[:12],
+                (task.category or '—')[:15],
+                task.target_date.strftime('%b %d, %Y') if task.target_date else '—',
+                task.status,
+                str(task.assigned_to)[:15] if task.assigned_to else '—',
+            ])
+        t = Table(data, repeatRows=1)
+        t.setStyle(header_style)
+        elements.append(t)
+
+    if export_type == 'category' or export_type == 'all':
+        if export_type == 'all':
+            elements.append(Spacer(1, 24))
+        elements.append(Paragraph('By Category Report', styles['Title']))
+        elements.append(Spacer(1, 12))
+        categories = ['Graphic Design', 'Audio-Visual Presentation',
+                      'Photography and Editing', 'Web and Digital Design',
+                      'Publication Design', 'Branding and Identity']
+        data2 = [['#', 'Category', 'Total', 'Completed', 'Ongoing', 'Requested']]
+        for i, cat in enumerate(categories, 1):
+            ct = tasks.filter(category__iexact=cat)
+            data2.append([str(i), cat, str(ct.count()),
+                          str(ct.filter(status='Completed').count()),
+                          str(ct.filter(status='Ongoing').count()),
+                          str(ct.filter(status='Requested').count())])
+        t2 = Table(data2, repeatRows=1)
+        t2.setStyle(header_style)
+        elements.append(t2)
+
+    if export_type == 'division' or export_type == 'all':
+        if export_type == 'all':
+            elements.append(Spacer(1, 24))
+        elements.append(Paragraph('By Division Report', styles['Title']))
+        elements.append(Spacer(1, 12))
+        divisions = tasks.values_list('division', flat=True).distinct()
+        data3 = [['#', 'Division', 'Total', 'Completed', 'Ongoing', 'Requested']]
+        for i, div in enumerate(divisions, 1):
+            if not div:
+                continue
+            dt = tasks.filter(division=div)
+            data3.append([str(i), div, str(dt.count()),
+                          str(dt.filter(status='Completed').count()),
+                          str(dt.filter(status='Ongoing').count()),
+                          str(dt.filter(status='Requested').count())])
+        t3 = Table(data3, repeatRows=1)
+        t3.setStyle(header_style)
+        elements.append(t3)
+
+    doc.build(elements)
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    filename = f'CVMC_Multimedia_Report_{export_type}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
 
 def forgot_password_view(request):
     return render(request, 'forgot_password.html')

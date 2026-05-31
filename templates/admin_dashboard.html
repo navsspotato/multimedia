@@ -927,16 +927,33 @@
     <div class="top-bar-right">
         <div class="icon-btn" id="notif-btn" onclick="toggleNotif()">
             <i class="bi bi-bell-fill"></i>
-            {% if requested_tasks %}
-            <span class="notif-badge" id="notif-count">{{ requested_tasks|length }}</span>
+            {% if requested_tasks or pending_users %}
+            <span class="notif-badge" id="notif-count">{{ requested_tasks|length|add:pending_count }}</span>
             {% endif %}
 
             <div class="notif-dropdown" id="notif-dropdown" onclick="event.stopPropagation()">
                 <div class="notif-header">
-                    <span><i class="bi bi-bell"></i> New Request</span>
+                    <span><i class="bi bi-bell"></i> Notifications</span>
                     <a href="#" onclick="markAllRead()">Mark all read</a>
                 </div>
                 <div class="notif-list" id="notif-list">
+                    {% for u in pending_users %}
+                    <div class="notif-item" id="notif-item-user-{{ u.pk }}" onclick="readAndGoApprovals('user-{{ u.pk }}')">
+                        <div class="notif-dot" id="dot-user-{{ u.pk }}"></div>
+                        <div>
+                            <div class="notif-text">
+                                <strong>{{ u.full_name }}</strong> — new user registration
+                            </div>
+                            <div class="notif-text" style="color:#64748b;">
+                                Role: {{ u.get_role_display }}
+                            </div>
+                            <div class="notif-time">
+                                {{ u.date_joined|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
                     {% for task in requested_tasks %}
                     <div class="notif-item" id="notif-item-{{ task.pk }}" onclick="readAndGo({{ task.pk }})">
                         <div class="notif-dot" id="dot-{{ task.pk }}"></div>
@@ -953,12 +970,14 @@
                             </div>
                         </div>
                     </div>
-                    {% empty %}
+                    {% endfor %}
+
+                    {% if not pending_users and not requested_tasks %}
                     <div class="notif-empty">
                         <i class="bi bi-bell-slash"></i>
-                        No new requests
+                        No new notifications
                     </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -1052,12 +1071,21 @@
             <div class="table-card">
                 <div class="table-card-header">
                     <div class="table-card-title">
-                        All Tasks
+                         All Tasks
                         <span style="font-size:12px; color:#94a3b8; font-weight:600; margin-left:8px;">
-                            ({{ tasks|length }} record{{ tasks|length|pluralize }})
+                             ({{ tasks|length }} record{{ tasks|length|pluralize }})
                         </span>
                     </div>
-                  
+                    <div style="display:flex; gap:8px;">
+                        <a href="{% url 'export_excel' %}?type=tasks"
+                            style="padding:7px 16px; border-radius:10px; background:#dcfce7; color:#15803d; font-size:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px; border:1px solid #bbf7d0;">
+                            <i class="bi bi-file-earmark-excel-fill"></i> Excel
+                        </a>
+                        <a href="{% url 'export_pdf' %}?type=tasks"
+                            style="padding:7px 16px; border-radius:10px; background:#fee2e2; color:#dc2626; font-size:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px; border:1px solid #fecaca;">
+                            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                        </a>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table">
@@ -1228,9 +1256,11 @@
             <div id="cat-tab-content">
 
                 <div id="cat-grid-view">
-                    <div class="mb-4">
-                        <h5 class="fw-bold" style="color:var(--navy);">Tasks by Category</h5>
-                        <p style="font-size:13px; color:#94a3b8;">Click a category to see detailed requests.</p>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color:var(--navy);">Tasks by Category</h5>
+                            <p style="font-size:13px; color:#94a3b8; margin:0;">Click a category to see detailed requests.</p>
+                        </div>
                     </div>
                     <div class="cat-overview">
                         {% for cat in category_stats %}
@@ -1318,9 +1348,21 @@
             <div id="div-tab-content" style="display:none;">
 
                 <div id="div-grid-view">
-                    <div class="mb-4">
-                        <h5 class="fw-bold" style="color:var(--navy);">Tasks by Division</h5>
-                        <p style="font-size:13px; color:#94a3b8;">Click a division to see detailed requests.</p>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color:var(--navy);">Tasks by Division</h5>
+                            <p style="font-size:13px; color:#94a3b8; margin:0;">Click a division to see detailed requests.</p>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <a href="{% url 'export_excel' %}?type=division"
+                                style="padding:7px 16px; border-radius:10px; background:#dcfce7; color:#15803d; font-size:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px; border:1px solid #bbf7d0;">
+                                <i class="bi bi-file-earmark-excel-fill"></i> Excel
+                            </a>
+                            <a href="{% url 'export_pdf' %}?type=division"
+                                style="padding:7px 16px; border-radius:10px; background:#fee2e2; color:#dc2626; font-size:12px; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:6px; border:1px solid #fecaca;">
+                                <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                            </a>
+                        </div>
                     </div>
 
                     <!-- month filter bar -->
@@ -1629,9 +1671,9 @@
     function applyReadState() {
         let unread = 0;
         document.querySelectorAll('.notif-item').forEach(item => {
-            const id = item.id.replace('notif-item-', '');
-            const dot = document.getElementById('dot-' + id);
-            if (readNotifs.has(id)) {
+            const rawId = item.id.replace('notif-item-', '');
+            const dot = document.getElementById('dot-' + rawId);
+            if (readNotifs.has(rawId)) {
                 if (dot) dot.classList.add('read');
                 item.style.opacity = '0.6';
             } else {
@@ -1659,6 +1701,14 @@
         applyReadState();
         document.getElementById('notif-dropdown').classList.remove('open');
         switchView('tasks', document.getElementById('nav-tasks'));
+    }
+
+    function readAndGoApprovals(id) {
+        readNotifs.add(String(id));
+        localStorage.setItem('readNotifs', JSON.stringify([...readNotifs]));
+        applyReadState();
+        document.getElementById('notif-dropdown').classList.remove('open');
+        switchView('approvals', document.getElementById('nav-approvals'));
     }
 
     function goToTasks() {
